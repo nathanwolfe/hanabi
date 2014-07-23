@@ -1,8 +1,0 @@
-class State:
-    def __init__(self, deck, disc, l, hint, ):
-        # d = list, disc = list, l = int, h = int
-        self.deck = deck
-        self.discards = disc
-        self.lives = l
-        self.hintcount
-        
