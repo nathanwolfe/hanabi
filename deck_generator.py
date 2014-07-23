@@ -12,12 +12,10 @@ list_3 = [Card(0, j) for j in range(0, 5)]
 full_list = list_1 + list_2 + list_3
 
 
-def generate(full_list):
+def generate():
     # Generate random number, pull the card at that index from full_list, add to final_list.
     final_list = []
     for i in range(50):
-        curr_card = random.randint(0, len(full_list))
+        curr_card = random.randint(0, len(full_list) - 1)
         final_list.append(full_list.pop(curr_card))
     return final_list
-
-
