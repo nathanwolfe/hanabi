@@ -1,4 +1,5 @@
 class Card:
+
     def __init__(self, n, c):
         # number and color should both be ints
         """
@@ -6,6 +7,8 @@ class Card:
         """
         self.number = n
         self.color = c
+        
+        # See TODO for important stuff to fill in here: trooleans
 
     def convert(self):
         # lowercase lettering should be the convention..
