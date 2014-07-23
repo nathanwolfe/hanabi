@@ -1,5 +1,0 @@
-"""
-Generates a list of Cards
-"""
-def generate():
-    
