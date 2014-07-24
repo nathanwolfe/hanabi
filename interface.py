@@ -73,9 +73,9 @@ def main():
     curplayer = 0
     while (len(players[curplayer].cards) > 0):
         print "----------P" + str(curplayer + 1) + "-----------"
-        curmove = players[curplayer].move()
+        curmove = players[curplayer].move(card_stacks)
         if (curmove.type == "play"):
-            if not play(players[curplayer], deck, card_stacks, discard_pile, 0):
+            if not play(players[curplayer], deck, card_stacks, discard_pile, curmove.card[0]):
                 lives -= 1
         elif (curmove.type == "discard"):
             discard(players[curplayer], deck, discard_pile, 0)
@@ -87,5 +87,6 @@ def main():
         curplayer = (curplayer + 1) % numplayers
         if (lives <= 0):
             print "Game Over"
+            print card_stacks
             sys.exit()  # just exits the program.
 main()

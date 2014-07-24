@@ -15,5 +15,15 @@ class Player:
         # c should be a list of card objects
         self.cards = c
 
-    def move(self):
+    def move(self, cs):
+        for i in range(len(self.cards)):
+            if self.play_is_valid(cs, self.cards[i]):
+                return Action("play", [i], None, None)
         return Action("play", [0], None, None)
+
+    def play_is_valid(self, cs, c):
+        # NEEDS TO BE FIXED SOON. THIS IS EXACT COPY OF is_valid()
+        # (if we're fine with redundancy, this is ok)
+        if cs[c.color] is c.number:
+            return True
+        return False
