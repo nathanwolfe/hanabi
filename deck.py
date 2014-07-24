@@ -16,6 +16,6 @@ class Deck:
         for i in range(len(self.cards)):
             s += self.cards[i].to_string() + "\n"
         return s
-	
-	def length(self):
-		return len(cards)
+
+    def length(self):
+        return len(self.cards)

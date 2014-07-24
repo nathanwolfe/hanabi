@@ -11,7 +11,7 @@ Nathan Wolfe
 Kristina Siladji
 Jerry Wu
 Patrick Revilla
-Evan [sorry idk your last name]
+Evan Wu
 Alvin Kao
 
 [Description of game]
