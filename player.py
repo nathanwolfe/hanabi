@@ -17,7 +17,3 @@ class Player:
 
     def move(self):
         return Action("play", [0], None, None)
-
-
-
-

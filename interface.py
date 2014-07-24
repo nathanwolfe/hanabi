@@ -10,13 +10,17 @@ from player import Player
 import deck_generator  # this is one of our own files
 
 
-def is_valid(c):
-    pass
+def is_valid(c, cs):
+    # c is the card that is being tested against cs, the currently played cards.
+    if cs[c.color] is c.number - 1:
+        return True
+    return False
 
 
 def play(p, d, cs, n):
     # d is the deck (should only be one), n is the index 0-4 of the card being played
-    # NOT COMPLETE DOES NOT PUT CARD IN A PILE....
+    # cs is card stack to play on.
+    cs[p.cards[n].color] += 1
     p.cards.pop(n)
     draw(p, d)
 
@@ -52,22 +56,20 @@ def main():
     players = [Player(phands[i]) for i in range(numplayers)]  # initialize players
 
     for i in players:
+        print "----------P" + str(curplayer + 1) + "-----------"
         for j in i.cards:
             print j.to_string()
-        print "---------------------"
+        curplayer += 1
 
     # while curplayer still has cards, make a move.
+    curplayer = 0
     while (len(players[curplayer].cards) > 0):
+        print "----------P" + str(curplayer + 1) + "-----------"
         curmove = players[curplayer].move()
         if (curmove.type == "play"):
-            curcard = players[curplayer].cards[curmove.card]
-            if (is_valid(curcard)):
-                card_stacks[curcard.color] = curcard.number
-                #needs to be implemented
-
+            play(players[curplayer], deck, card_stacks, 0)
         for k in players[curplayer].cards:
             print k.to_string()
-        print "----------------"
         curplayer = (curplayer + 1) % numplayers
 
 main()
