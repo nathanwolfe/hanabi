@@ -41,6 +41,19 @@ def draw(p, d):
         p.cards.append(d.pop_card())
 
 
+def game_end(game):
+    # add more stuff later, this is a end game clean up function.
+    print "Game Over: Results"
+    print game.states[len(game.states) - 1].stacks
+
+    score = 0
+    for i in range(len(game.states[len(game.states) - 1].stacks)):
+        score += game.states[len(game.states) - 1].stacks[i]
+    print score
+
+    sys.exit()  # just exits the program.
+
+
 def main():
     deck = deck_generator.generate()
     # print deck.to_string()
@@ -57,6 +70,11 @@ def main():
 
     phands = [[deck.pop_card() for i in range(cpp)] for j in range(numplayers)]  # initialize hands
     players = [Player(phands[i]) for i in range(numplayers)]  # initialize players
+
+    # if confused see the State constructor in state.py
+    g_state = State(deck, discard_pile, lives, hints, card_stacks, players)
+    state_list = [g_state]
+    game = Game(state_list)
 
     for i in players:
         print "----------P" + str(curplayer + 1) + "-----------"
@@ -80,8 +98,11 @@ def main():
         for k in players[curplayer].cards:
             print k.to_string()
         curplayer = (curplayer + 1) % numplayers
+
+        # recreate g_state and add to list of states - WILL NEED TO BE CHANGED WHEN HINT IS ADDED
+        g_state = State(deck, discard_pile, lives, hints, card_stacks, players)
+        game.states.append(g_state)
+
         if (lives <= 0):
-            print "Game Over"
-            print card_stacks
-            sys.exit()  # just exits the program.
+            game_end(game)
 main()

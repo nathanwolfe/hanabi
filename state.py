@@ -4,8 +4,7 @@ class State:
         self.deck = deck
         self.discards = disc
         self.lives = l
-        self.hcount = h #hints
-        self.stacks = s  # 5-array, one per color; entry is the # of cards played of that color
-        self.players = p  # leave this for now I guess...
-		
-		#TODO: hands, hints given on this turn
+        self.hcount = h  # hints
+        self.stacks = s
+        self.players = p
+        #TODO: hands, hints given on this turn
