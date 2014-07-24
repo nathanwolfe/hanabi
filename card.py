@@ -11,7 +11,7 @@ class Card:
         # See TODO for important stuff to fill in here: trooleans
 
     def to_string(self):
-        return str(self.number) + self.convert()
+        return str(self.number + 1) + self.convert()
 
     def convert(self):
         # lowercase lettering should be the convention..
