@@ -24,9 +24,9 @@ def main():
     for i in range(5):
         p1_hand.append(deck.pop_card())
     p1 = Player(p1_hand)
-    p1.draw(deck)
     for i in p1.cards:
         print i.to_string()
+    p1.play(deck, 2)
     p1.discard(deck, discard_pile, 1)
     for i in p1.cards:
         print i.to_string()
