@@ -7,6 +7,7 @@ import random
 """
 Creating a full_list of cards
 """
+
 list_1 = [Card(i % 5, i / 5) for i in range(0, 25)]  # one copy of each card
 list_2 = [Card(i % 5, i / 5) for i in range(0, 20)]
 list_3 = [Card(j, 0) for j in range(0, 5)]

@@ -1,19 +1,17 @@
 class Card:
 
-    def __init__(self, c, n):
+    def __init__(self, c, n, k=[[0 for i in range(5)] for j in range(5)]):
         # number and color should both be ints
-		# number and color both range 0 through 4
+        # number and color both range 0 through 4
         """
         Color: Red Yellow Green Blue White -> 0 1 2 3 4
         """
         self.number = n
         self.color = c
-        
-        # See TODO for important stuff to fill in here: trooleans
-		## Unless player tracks that personally?
+        self.known = k
 
-    def to_string(self): 
-		#with the color first because that's how you say it
+    def to_string(self):
+        # with the color first because that's how you say it
         return self.convert() + " " + str(self.number + 1)
 
     def convert(self):
@@ -29,5 +27,3 @@ class Card:
             return "b"
         elif self.color == 4:
             return "w"
-    
-    
