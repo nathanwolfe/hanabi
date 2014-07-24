@@ -14,5 +14,8 @@ class Deck:
         # merely prints out a list of the cards still in the deck
         s = ""
         for i in range(len(self.cards)):
-            s += str(self.cards[i].number + 1) + self.cards[i].convert() + "\n"
+            s += self.cards[i].to_string() + "\n"
         return s
+	
+	def length(self):
+		return len(cards)

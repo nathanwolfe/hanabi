@@ -2,9 +2,17 @@ Hanabi AI
 
 Mathcamp 2014
 
-Project Leader: Mira Bernstein
+Project Leader: 
+Mira Bernstein
 
-Project Members: [fill in]
+Project Members: 
+Andrew Li
+Nathan Wolfe
+Kristina Siladji
+Jerry Wu
+Patrick Revilla
+Evan [sorry idk your last name]
+Alvin Kao
 
 [Description of game]
 

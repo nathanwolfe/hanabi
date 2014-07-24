@@ -2,6 +2,7 @@
 Project Advisor: Mira Bernstein
 Project Members: Andrew Li, Nathan Wolfe, Jerry Wu, Patrick Revilla, Alvin Kao, Cristina ________, Alex Chen, hope I didn't forget anyone
 """
+#see readme pls^
 from card import Card
 from state import State
 from deck import Deck
