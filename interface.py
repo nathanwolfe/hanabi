@@ -9,8 +9,10 @@ from game import Game
 from player import Player
 import deck_generator  # this is one of our own files
 
+
 def is_valid(c):
     pass
+
 
 def play(p, d, cs, n):
     # d is the deck (should only be one), n is the index 0-4 of the card being played
@@ -18,15 +20,18 @@ def play(p, d, cs, n):
     p.cards.pop(n)
     draw(p, d)
 
+
 def discard(p, d, disc, n):
     # d is the deck, disc is the discard
     disc.append(p.cards.pop(n))
     draw(p, d)
 
+
 def draw(p, d):
     # d is the deck
     if (len(d.cards) > 0):
         p.cards.append(d.pop_card())
+
 
 def main():
     deck_list = deck_generator.generate()
