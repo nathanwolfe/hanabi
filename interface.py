@@ -8,21 +8,29 @@ from deck import Deck
 from game import Game
 from player import Player
 import deck_generator  # this is one of our own files
+import sys
 
 
 def is_valid(c, cs):
     # c is the card that is being tested against cs, the currently played cards.
-    if cs[c.color] is c.number - 1:
+    if cs[c.color] is c.number:
         return True
     return False
 
 
-def play(p, d, cs, n):
+def play(p, d, cs, disc, n):
     # d is the deck (should only be one), n is the index 0-4 of the card being played
-    # cs is card stack to play on.
-    cs[p.cards[n].color] += 1
-    p.cards.pop(n)
-    draw(p, d)
+    # cs is card stack to play on, disc is discard
+    # returns True if is_valid() is true, False if not
+    draw(p, d)  # this needs to go first since this function actually returns stuff
+    if (is_valid(p.cards[n], cs)):
+        cs[p.cards[n].color] += 1
+        p.cards.pop(n)
+        return True
+    else:
+        print "You lost a life"
+        disc.append(p.cards.pop(n))
+        return False
 
 
 def discard(p, d, disc, n):
@@ -67,9 +75,17 @@ def main():
         print "----------P" + str(curplayer + 1) + "-----------"
         curmove = players[curplayer].move()
         if (curmove.type == "play"):
-            play(players[curplayer], deck, card_stacks, 0)
+            if not play(players[curplayer], deck, card_stacks, discard_pile, 0):
+                lives -= 1
+        elif (curmove.type == "discard"):
+            discard(players[curplayer], deck, discard_pile, 0)
+        elif (curmove.type == "hint"):
+            # hint not implemented yet
+            pass
         for k in players[curplayer].cards:
             print k.to_string()
         curplayer = (curplayer + 1) % numplayers
-
+        if (lives <= 0):
+            print "Game Over"
+            sys.exit()  # just exits the program.
 main()
