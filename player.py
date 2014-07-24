@@ -13,13 +13,18 @@ class Player:
     def __init__(self, c):
         # c should be a list of card objects
         self.cards = c
-    
+
     def play(self, d, n):
         # d is the deck (should only be one), n is the index 0-4 of the card being played
         # NOT COMPLETE DOES NOT PUT CARD IN A PILE....
         self.cards.pop(n)
-        self.cards.insert(0, d.pop_card())
+        self.draw(d)
 
-    def discard(self):
-        # fill in parameters and body, should be same as play, also get rid of this pass placeholder
-        pass
+    def discard(self, d, disc, n):
+        # d is the deck, disc is the discard
+        disc.append(self.cards.pop(n))
+        self.draw(d)
+
+    def draw(self, d):
+        # d is the deck
+        self.cards.append(d.pop_card())

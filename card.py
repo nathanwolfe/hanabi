@@ -10,6 +10,9 @@ class Card:
         
         # See TODO for important stuff to fill in here: trooleans
 
+    def to_string(self):
+        return str(self.number) + self.convert()
+
     def convert(self):
         # lowercase lettering should be the convention..
         # this may be relatively ugly, but there are only five options anyway
@@ -23,3 +26,5 @@ class Card:
             return "b"
         elif self.color == 4:
             return "w"
+    
+    

@@ -5,5 +5,5 @@ class State:
         self.discards = disc
         self.lives = l
         self.hcount = h
-        self.stacks = s
+        self.stacks = s  # 5x5 array, 1 if played in 0 if not
         self.players = p  # leave this for now I guess...
