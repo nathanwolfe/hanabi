@@ -58,17 +58,15 @@ def main():
     curturn = 0  # the current turn (first turn is turn 0)
     final_countdown = NUM_PLAYERS  # this is for when all the cards run out
     while True:
-        # idea: copy current state, make moves, put this modified state as the new state 
-		# at end of states list of game, let players rearrange hand, let players look around.
+        # idea: copy current state, make moves, put this modified state as the new state
+        # at end of states list of game, let players rearrange hand, let players look around.
         state = game.states[curturn]
         print "----------P" + str(state.curplayer + 1) + "-----------"
-		
-		# Censor information of player's own hand + the deck and then pass to the player for a move
-		censored = state
-		censored.hands[curplayer].cards=[]
-		for i in xrange(len(censored.deck.cards)):
-			censored.deck.cards[i] = Card(0, 0)
-		
+        # Censor information of player's own hand + the deck and then pass to the player for a move
+        censored = state
+        censored.hands[state.curplayer].cards = []
+        for i in xrange(len(censored.deck.cards)):
+            censored.deck.cards[i] = Card(0, 0)
         curmove = state.players[state.curplayer].move(censored)
         if curmove.type == "play":
             if not state.hands[state.curplayer].play(state, curmove.card):
@@ -77,44 +75,40 @@ def main():
             state.hands[state.curplayer].discard(state, curmove.card)
             if state.hints < 8:
                 state.hints += 1
-		elif curmove.type == "color":
-			state.hands[curmove.player].hint(curmove.card, "color")
-			assert state.hints > 0, "Tried to hint when out of hints: player " + str(curplayer)
-			state.hints -= 1
-		else 
-			assert curmove.type == "number", "invalid move string specified"
-			state.hands[curmove.player].hint(curmove.card, "number")
-			assert state.hints > 0, "Tried to hint when out of hints: player " + str(curplayer)
-			state.hints -= 1
-			
-		# debug
+        elif curmove.type == "color":
+            state.hands[curmove.player].hint(curmove.card, "color")
+            assert state.hints > 0, "Tried to hint when out of hints: player " + str(state.curplayer)
+            state.hints -= 1
+        else:
+            assert curmove.type == "number", "invalid move string specified"
+            state.hands[curmove.player].hint(curmove.card, "number")
+            assert state.hints > 0, "Tried to hint when out of hints: player " + str(state.curplayer)
+            state.hints -= 1
+        # debug
         for k in state.hands[state.curplayer].cards:
             print k.to_string()
-		
         state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
         curturn += 1
 
         # recreate g_state and add to list of states - WILL NEED TO BE CHANGED WHEN HINT IS ADDED
-		# Why does this need to be changed? --Jerry
+        # Why does this need to be changed? --Jerry
         game.states.append(state)
-		
-		for p in state.players:
-			# censor each player's hands + the deck, then pass state for rearrangement
-			visible = state
-			visible.hands[p.number].cards = []
-			for i in xrange(len(visible.deck.cards)):
-				visible.deck.cards[i] = Card(0, 0)
-			permutation = p.rearrange(visible)
-			state.hands[p.number].rearrange(permutation)
+        for p in state.players:
+            # censor each player's hands + the deck, then pass state for rearrangement
+            visible = state
+            visible.hands[p.number].cards = []
+            for i in xrange(len(visible.deck.cards)):
+                visible.deck.cards[i] = Card(0, 0)
+                permutation = p.rearrange(visible)
+                state.hands[p.number].rearrange(permutation)
 
-		for p in state.players:
-			# censor handss + the deck then pass for lookaround
-			visible = state
-			visible.hands[p.number].cards = []
-			for i in xrange(len(visible.deck.cards)):
-				visible.deck.cards[i] = Card(0, 0)
-			p.scan(visible)
-		
+            for p in state.players:
+                # censor handss + the deck then pass for lookaround
+                visible = state
+                visible.hands[p.number].cards = []
+                for i in xrange(len(visible.deck.cards)):
+                    visible.deck.cards[i] = Card(0, 0)
+                p.scan(visible)
         if len(state.deck.cards) == 0:
             final_countdown -= 1
         if state.lives <= 0 or state.calc_score() == 25 or final_countdown == 0:
