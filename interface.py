@@ -58,7 +58,7 @@ def main():
         # idea: copy current state, make moves, put this modified state as the new state at end of states list of game.
         state = game.states[curstate]
         print "----------P" + str(state.curplayer + 1) + "-----------"
-        curmove = state.hands[state.curplayer].move(state.stacks)
+        curmove = state.players[state.curplayer].move(state.stacks)
         if curmove.type == "play":
             if not state.hands[state.curplayer].play(state, curmove.card):
                 state.lives -= 1

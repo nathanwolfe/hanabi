@@ -11,9 +11,9 @@ class Hand:
 
     def play(self, state, n):
         # returns True if is_valid() is true, False if not
-        self.draw(state.deck)  # this needs to go first since this function actually returns stuff
+        self.draw(state)  # this needs to go first since this function actually returns stuff
         if self.is_valid(n, state):
-            state.stacks[self.cards.color] += 1
+            state.stacks[self.cards[n].color] += 1
             self.cards.pop(n)
             return True
         else:
@@ -21,9 +21,9 @@ class Hand:
             state.discards.append(self.cards.pop(n))
             return False
 
-    def is_valid(c, state):
-        # c is the card that is being tested against cs, the currently played cards.
-        if state.stacks[c.color] is c.number:
+    def is_valid(self, c, state):
+        # c is the card index that is being tested against cs, the currently played cards.
+        if state.stacks[self.cards[c].color] is self.cards[c].number:
             return True
         return False
 

@@ -4,7 +4,7 @@ class State:
         self.deck = deck
         self.discards = disc
         self.lives = l
-        self.hcount = h  # hints left
+        self.hints = h  # hints left
         self.stacks = s
         self.hands = hands  # list of Hand objects
         self.players = p  # players
