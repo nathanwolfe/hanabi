@@ -6,6 +6,9 @@ from player import Player
 import deck_generator  # this is one of our own files
 import sys
 
+CPP = 5
+NUM_PLAYERS = 2
+
 
 def is_valid(c, cs):
     # c is the card that is being tested against cs, the currently played cards.
@@ -51,60 +54,58 @@ def game_end(game):
     sys.exit()  # just exits the program.
 
 
-def main():
+def setup():
     deck = deck_generator.generate()
-    # print deck.to_string()
-
     discard_pile = []
     lives = 3
     hints = 8
     card_stacks = [0 for i in range(5)]
 
-    # cpp = cards per player
-    numplayers = 2
-    cpp = 5
-    curplayer = 0
-
-    phands = [[deck.pop_card() for i in range(cpp)] for j in range(numplayers)]  # initialize hands
-    players = [Player(phands[i]) for i in range(numplayers)]  # initialize players
+    phands = [[deck.pop_card() for i in range(CPP)] for j in range(NUM_PLAYERS)]  # initialize hands
+    players = [Player(phands[i]) for i in range(NUM_PLAYERS)]  # initialize players
 
     # if confused see the State constructor in state.py
     g_state = State(deck, discard_pile, lives, hints, card_stacks, players)
     state_list = [g_state]
     game = Game(state_list)
+    return game
 
-    for i in players:
+
+def main():
+    # CPP = cards per player
+    curplayer = 0
+
+    game = setup()
+
+    for i in game.states[0].players:
         print "----------P" + str(curplayer + 1) + "-----------"
-        for j in i.cards:
+        for j in game.states[0].players.cards:
             print j.to_string()
         curplayer += 1
 
     # while curplayer still has cards, make a move.
     curplayer = 0
-    final_countdown = numplayers
+    curstate = 1
+    final_countdown = NUM_PLAYERS
     while (True):
+        state = game.states[curstate]
         print "----------P" + str(curplayer + 1) + "-----------"
-        curmove = players[curplayer].move(card_stacks)  # THIS IS AN ACTION YOU NOOB
+        curmove = state.players[curplayer].move(state.stacks)
         if (curmove.type == "play"):
-            if not play(players[curplayer], deck, card_stacks, discard_pile, curmove.card[0]):
-                lives -= 1
+            if not play(state.players[curplayer], state.deck, state.stacks, state.discards, curmove.card):
+                state.lives -= 1
         elif (curmove.type == "discard"):
-            discard(players[curplayer], deck, discard_pile, 0)
-        elif (curmove.type == "color"):
-            for i in curmove.player.cards:
-                
-        elif (curmove.type == "number"):
-            pass
-        for k in players[curplayer].cards:
+            discard(state.players[curplayer], state.deck, state.discards, 0)
+        for k in state.players[curplayer].cards:
             print k.to_string()
-        curplayer = (curplayer + 1) % numplayers
+        curplayer = (curplayer + 1) % NUM_PLAYERS
+        curstate += 1
 
         # recreate g_state and add to list of states - WILL NEED TO BE CHANGED WHEN HINT IS ADDED
-        g_state = State(deck, discard_pile, lives, hints, card_stacks, players)
-        game.states.append(g_state)
+        game.states.append(state)
 
-        if len(deck.cards) == 0:
+        if len(state.deck.cards) == 0:
             final_countdown -= 1
-        if lives <= 0 or g_state.calc_score() == 25 or final_countdown == 0:
+        if state.lives <= 0 or state.calc_score() == 25 or final_countdown == 0:
             game_end(game)
 main()
