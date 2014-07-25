@@ -63,9 +63,11 @@ def main():
         state = game.states[curturn]
         print "----------P" + str(state.curplayer + 1) + "-----------"
 		
-		# Censor information of player's own hand and then pass to the player for a move
+		# Censor information of player's own hand + the deck and then pass to the player for a move
 		censored = state
 		censored.hands[curplayer].cards=[]
+		for i in xrange(len(censored.deck.cards)):
+			censored.deck.cards[i] = Card(0, 0)
 		
         curmove = state.players[state.curplayer].move(censored)
         if curmove.type == "play":
@@ -97,16 +99,20 @@ def main():
         game.states.append(state)
 		
 		for p in state.players:
-			# censor each player's hands, then pass state for rearrangement
+			# censor each player's hands + the deck, then pass state for rearrangement
 			visible = state
 			visible.hands[p.number].cards = []
+			for i in xrange(len(visible.deck.cards)):
+				visible.deck.cards[i] = Card(0, 0)
 			permutation = p.rearrange(visible)
 			state.hands[p.number].rearrange(permutation)
 
 		for p in state.players:
-			# censor hands then pass for lookaround
+			# censor handss + the deck then pass for lookaround
 			visible = state
 			visible.hands[p.number].cards = []
+			for i in xrange(len(visible.deck.cards)):
+				visible.deck.cards[i] = Card(0, 0)
 			p.scan(visible)
 		
         if len(state.deck.cards) == 0:

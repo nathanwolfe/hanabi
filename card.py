@@ -1,6 +1,6 @@
 class Card:
 
-    def __init__(self, c, n, i=[[0 for i in range(5)] for j in range(5)]):
+    def __init__(self, c, n):
         # number and color should both be ints
         # number and color both range 0 through 4
         """
@@ -8,9 +8,6 @@ class Card:
         """
         self.number = n
         self.color = c
-        # this is the info that a player knows about the card - 0 if ?, 1 if yes, -1 if no
-        # also keep in mind that info[i][j] will refer to whether the player knows if this is a card with color i and/or number j.
-        self.info = i
 
     def to_string(self):
         # with the color first because that's how you say it
