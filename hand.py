@@ -52,6 +52,8 @@ class Hand:
         if len(state.deck.cards) > 0:
             self.cards.append(state.deck.pop_card())
             self.info.append([-1 for i in range(2)])
+        else:
+            self.size -= 1
 
     def rearrange(self, permute):  # example: [3, 0, 1, 2, 4]: move the card currently #3 to be the leftmost card in hand
         assert len(permute) == len(self.cards)

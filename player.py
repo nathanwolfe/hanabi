@@ -37,11 +37,13 @@ class Player:
                     return Action("discard", i, None)
             # Whatever, let's just discard something.
             return Action("discard", 0, None)
+        #print "Nothing playable."
         # If someone has something playable, hint that.
         for i in range(len(state.players)):
             if i == self.number: 
                 continue
             for j in range(state.hands[i].size):
+                #print "size: " + str(len(state.hands[i].cards)) + "; " + str(j)
                 if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
                     if state.hands[i].info[j][0] == -1:
                         print "Hinting color: " + str(j) + " of P" + str(i)
@@ -74,7 +76,7 @@ class Player:
     # This function isn't required; I'm implementing this to make things easier
     def playable(self, color, number, stacks):  # Is the card guaranteed playable on stacks (list)?
         # color and number should be -1 if unknown
-        print str(color) + " " + str(number) + " -> " + str(stacks[color]) + " " + str(number)
+        # print str(color) + " " + str(number) + " -> " + str(stacks[color]) + " " + str(number)
         if color == -1 or number == -1:
             return False
         if stacks[color] == number:
