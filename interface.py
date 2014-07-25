@@ -46,10 +46,7 @@ def game_end(game):
     print "Game Over: Results"
     print game.states[len(game.states) - 1].stacks
 
-    score = 0
-    for i in range(len(game.states[len(game.states) - 1].stacks)):
-        score += game.states[len(game.states) - 1].stacks[i]
-    print score
+    print game.states[len(game.states) - 1].calc_score()
 
     sys.exit()  # just exits the program.
 
@@ -84,16 +81,19 @@ def main():
 
     # while curplayer still has cards, make a move.
     curplayer = 0
-    while (len(players[curplayer].cards) > 0):
+    final_countdown = numplayers
+    while (True):
         print "----------P" + str(curplayer + 1) + "-----------"
-        curmove = players[curplayer].move(card_stacks)
+        curmove = players[curplayer].move(card_stacks)  # THIS IS AN ACTION YOU NOOB
         if (curmove.type == "play"):
             if not play(players[curplayer], deck, card_stacks, discard_pile, curmove.card[0]):
                 lives -= 1
         elif (curmove.type == "discard"):
             discard(players[curplayer], deck, discard_pile, 0)
-        elif (curmove.type == "hint"):
-            # hint not implemented yet
+        elif (curmove.type == "color"):
+            for i in curmove.player.cards:
+                
+        elif (curmove.type == "number"):
             pass
         for k in players[curplayer].cards:
             print k.to_string()
@@ -103,6 +103,8 @@ def main():
         g_state = State(deck, discard_pile, lives, hints, card_stacks, players)
         game.states.append(g_state)
 
-        if (lives <= 0):
+        if len(deck.cards) == 0:
+            final_countdown -= 1
+        if lives <= 0 or g_state.calc_score() == 25 or final_countdown == 0:
             game_end(game)
 main()
