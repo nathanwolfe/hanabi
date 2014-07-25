@@ -35,7 +35,7 @@ def setup():
     hands = []
     for i in phands:
         hands.append(Hand(i, HAND_SIZE))
-    players = [Player(phands[i]) for i in range(NUM_PLAYERS)]  # initialize players
+    players = [Player(i) for i in range(NUM_PLAYERS)]  # initialize players
 
     # if confused see the State constructor in state.py
     g_state = State(deck, discard_pile, lives, hints, card_stacks, hands, players, 0)
@@ -47,7 +47,7 @@ def setup():
 def main():
     game = setup()  # see setup function
 
-    # merely print out all the cards of all the players
+    # print out all the cards of all the players for debug
     for i in game.states[0].hands:
         print "----------P" + str(game.states[0].curplayer + 1) + "-----------"
         for j in i.cards:
@@ -55,13 +55,19 @@ def main():
         game.states[0].curplayer += 1
 
     game.states[0].curplayer = 0  # setting back to 0
-    curstate = 0  # the current turn (first turn is turn 0)
+    curturn = 0  # the current turn (first turn is turn 0)
     final_countdown = NUM_PLAYERS  # this is for when all the cards run out
     while True:
-        # idea: copy current state, make moves, put this modified state as the new state at end of states list of game.
-        state = game.states[curstate]
+        # idea: copy current state, make moves, put this modified state as the new state 
+		# at end of states list of game, let players rearrange hand, let players look around.
+        state = game.states[curturn]
         print "----------P" + str(state.curplayer + 1) + "-----------"
-        curmove = state.players[state.curplayer].move(state.stacks)
+		
+		# Censor information of player's own hand and then pass to the player for a move
+		censored = state
+		censored.hands[curplayer].cards=[]
+		
+        curmove = state.players[state.curplayer].move(censored)
         if curmove.type == "play":
             if not state.hands[state.curplayer].play(state, curmove.card):
                 state.lives -= 1
@@ -69,17 +75,42 @@ def main():
             state.hands[state.curplayer].discard(state, curmove.card)
             if state.hints < 8:
                 state.hints += 1
+		elif curmove.type == "color":
+			state.hands[curmove.player].hint(curmove.card, "color")
+			assert state.hints > 0, "Tried to hint when out of hints: player " + str(curplayer)
+			state.hints -= 1
+		else 
+			assert curmove.type == "number", "invalid move string specified"
+			state.hands[curmove.player].hint(curmove.card, "number")
+			assert state.hints > 0, "Tried to hint when out of hints: player " + str(curplayer)
+			state.hints -= 1
+			
+		# debug
         for k in state.hands[state.curplayer].cards:
             print k.to_string()
+		
         state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
-        curstate += 1
+        curturn += 1
 
         # recreate g_state and add to list of states - WILL NEED TO BE CHANGED WHEN HINT IS ADDED
+		# Why does this need to be changed? --Jerry
         game.states.append(state)
+		
+		for p in state.players:
+			# censor each player's hands, then pass state for rearrangement
+			visible = state
+			visible.hands[p.number].cards = []
+			permutation = p.rearrange(visible)
+			state.hands[p.number].rearrange(permutation)
 
+		for p in state.players:
+			# censor hands then pass for lookaround
+			visible = state
+			visible.hands[p.number].cards = []
+			p.scan(visible)
+		
         if len(state.deck.cards) == 0:
             final_countdown -= 1
         if state.lives <= 0 or state.calc_score() == 25 or final_countdown == 0:
             game_end(game)
-        # TODO: Players forage for information
 main()

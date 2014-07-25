@@ -32,18 +32,21 @@ class Hand:
         state.discards.append(self.cards.pop(n))
         self.draw(state)
 
-    def hint(self, positions, type, val):  # for when someone hints this hand
-        # positions = cards hinted, type = "color" or "number", val = 0 - 4
-        for i in positions:
-            if (type == "color"):
-                self.info[i][0] = val
-            elif (type == "number"):
-                self.info[i][1] = val
+    def hint(self, pos, type):  # for when someone hints this hand
+		# pos = card to hint, type = "color" or "number", val = 0 - 4
+		# TODO: test this?
+        for i in self.cards:
+            if type == "color":
+				if self.cards[i].color = self.cards[pos].color:
+					self.info[i][0] = self.cards[pos].color
+            else:
+				assert type == "number", "invalid hint function call"
+				if self.cards[i].number = self.cards[pos].number:
+					self.info[i][1] = self.cards[pos].number
+			
 
     def draw(self, state):
         # d is the deck
         if len(state.deck.cards) > 0:
             self.cards.append(state.deck.pop_card())
 
-
-    # TODO - SWAPPING POSITIONS IN HAND.
