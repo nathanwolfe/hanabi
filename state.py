@@ -1,13 +1,12 @@
 class State:
-    def __init__(self, deck, disc, l, h, s, p, hands):
-        # d = Deck, disc = list, l = int, hcount = int, s = list, p = list
+    def __init__(self, deck, disc, l, h, s, hands):
+        # d = Deck, disc = list, l = int, hcount = int, s = list, hands = list of hand objects, hint = hint object
         self.deck = deck
         self.discards = disc
         self.lives = l
-        self.hcount = h  # hints
+        self.hcount = h  # hints left
         self.stacks = s
-        self.players = p
-        self.hands = hands
+        self.hands = hands # list of lists
 
     def calc_score(self):
         result = 0
