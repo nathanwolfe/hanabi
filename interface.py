@@ -18,7 +18,8 @@ def game_end(game):
     f = open("game_results.txt", "w")
     print "Game Over: Results"
     print game.states[len(game.states) - 1].stacks
-    f.write(game.states[len(game.states) - 1].stacks) #something is wrong here?
+    stacks_as_string = ", ".join(str(i) for i in game.states[len(game.states) - 1].stacks)
+    f.write(stacks_as_string + "\n")
     print game.states[len(game.states) - 1].calc_score()
     f.write("Score: " + str(game.states[len(game.states) - 1].calc_score()))
 
