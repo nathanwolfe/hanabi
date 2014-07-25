@@ -12,11 +12,14 @@ NUM_PLAYERS = 2
 
 
 def game_end(game):
+
     # add more stuff later, this is a end game clean up function.
+    f = open("game_results.txt", "w")
     print "Game Over: Results"
     print game.states[len(game.states) - 1].stacks
-
+    f.write(game.states[len(game.states) - 1].stacks)
     print game.states[len(game.states) - 1].calc_score()
+    f.write("Score: " + str(game.states[len(game.states) - 1].calc_score()))
 
     sys.exit()  # just exits the program.
 
