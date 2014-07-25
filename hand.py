@@ -37,15 +37,19 @@ class Hand:
 
     def hint(self, pos, type):  # for when someone hints this hand
         # pos = card to hint, type = "color" or "number", val = 0 - 4
-        # TODO: test this?
+        # returns list of hinted cards
+        hinted = []
         for i in range(len(self.cards)):
             if type == "color":
                 if self.cards[i].color == self.cards[pos].color:
                     self.info[i][0] = self.cards[pos].color
+                    hinted.append(i)
             else:
                 assert type == "number", "invalid hint function call"
                 if self.cards[i].number == self.cards[pos].number:
                     self.info[i][1] = self.cards[pos].number
+                    hinted.append(i)
+        return hinted
 
     def draw(self, state):
         # d is the deck

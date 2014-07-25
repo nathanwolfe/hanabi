@@ -71,21 +71,24 @@ def main():
             censored.deck.cards[i] = Card(0, 0)
         curmove = state.players[state.curplayer].move(censored)
         if curmove.type == "play":
-            if not state.hands[state.curplayer].play(state, curmove.card):
+            if not state.hands[state.curplayer].play(state, curmove.cards):
                 state.lives -= 1
         elif curmove.type == "discard":
-            state.hands[state.curplayer].discard(state, curmove.card)
+            state.hands[state.curplayer].discard(state, curmove.cards)
             if state.hints < 8:
                 state.hints += 1
         elif curmove.type == "color":
-            state.hands[curmove.player].hint(curmove.card, "color")
+            hinted = state.hands[curmove.player].hint(curmove.cards, "color")
             assert state.hints > 0, "Tried to hint when out of hints: player " + str(state.curplayer)
             state.hints -= 1
+            curmove.cards = hinted  # Before attaching, correct the action to list all cards hinted
         else:
             assert curmove.type == "number", "invalid move string specified"
-            state.hands[curmove.player].hint(curmove.card, "number")
+            hinted = state.hands[curmove.player].hint(curmove.cards, "number")
             assert state.hints > 0, "Tried to hint when out of hints: player " + str(state.curplayer)
             state.hints -= 1
+            curmove.cards = hinted
+        state.attach_action(curmove)
         # debug
         for k in state.hands[state.curplayer].cards:
             print k.to_string()
