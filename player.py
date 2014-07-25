@@ -20,8 +20,8 @@ class Player:
     def move(self, cs):
         for i in range(len(self.cards)):
             if self.play_is_valid(cs, self.cards[i]):
-                return Action("play", [i], None, None)
-        return Action("discard", [0], None, None)
+                return Action("play", [i], None)
+        return Action("discard", [0], None)
 
     def play_is_valid(self, cs, c):
         # NEEDS TO BE FIXED SOON. THIS IS EXACT COPY OF is_valid()
