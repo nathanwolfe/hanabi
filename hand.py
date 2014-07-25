@@ -15,10 +15,12 @@ class Hand:
         if self.is_valid(n, state):
             state.stacks[self.cards[n].color] += 1
             self.cards.pop(n)
+            self.info.pop(n)
             return True
         else:
             print "You lost a life"
             state.discards.append(self.cards.pop(n))
+            self.info.pop(n)
             return False
 
     def is_valid(self, c, state):
@@ -30,6 +32,7 @@ class Hand:
     def discard(self, state, n):
         # d is the deck, disc is the discard
         state.discards.append(self.cards.pop(n))
+        self.info.pop(n)
         self.draw(state)
 
     def hint(self, pos, type):  # for when someone hints this hand
@@ -48,6 +51,7 @@ class Hand:
         # d is the deck
         if len(state.deck.cards) > 0:
             self.cards.append(state.deck.pop_card())
+            self.info.append([-1 for i in range(2)])
 
     def rearrange(self, permute):  # example: [3, 0, 1, 2, 4]: move the card currently #3 to be the leftmost card in hand
         assert len(permute) == len(self.cards)

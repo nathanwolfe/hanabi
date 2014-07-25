@@ -1,6 +1,6 @@
 class State:
     def __init__(self, deck, disc, l, h, s, hands, p, cp):
-        # d = Deck, disc = list, l = int, hcount = int, s = list, hands = list of hand objects, hint = hint object, cp = current player
+        # d = Deck, disc = list, l = int, hcount = int, s = list, hands = list of hand objects, p = list of players, cp = current player
         self.deck = deck
         self.discards = disc
         self.lives = l
