@@ -88,9 +88,32 @@ class Player:
         else:
             return False
 
-    # these took a while make surprisingly.
+    # these took a while to make surprisingly.
     def newest_card(self, state):
         return max(state.hands[self.number].cards, key=attrgetter("turn_drawn"))
 
     def oldest_card(self, state):
         return min(state.hands[self.number].cards, key=attrgetter("turn_drawn"))
+
+    def is_last(self, state, n):
+        # function determines whether a card is the last of its kind
+        card_color = state.hands[self.number].info[n][0]
+        card_num = state.hands[self.number].info[n][1]
+        counter = 0
+
+        for i in state.discards:
+            if i.color == card_color and i.number == card_num:
+                counter += 1
+
+        assert counter <= 2
+        if counter == 0:
+            return False
+        elif counter == 1:
+            assert not card_num == 4
+            if card_num == 1 or card_num == 2 or card_num == 3:
+                return False
+            elif card_num == 0:
+                return True
+        elif counter == 2:
+            assert card_num == 1
+            return True
