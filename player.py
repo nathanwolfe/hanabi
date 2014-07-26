@@ -83,11 +83,17 @@ class Player:
 
     def newest_card(self, state):
         # try not to understand this line...andrew is a sleepy boy right now
-        val, idx = min((self.card_age(val), idx) for (idx, val) in enumerate(state.hands[self.number].cards))
+        val = min((self.card_age(state, i)) for i in state.hands[self.number].cards)
+        return val
 
     def oldest_card(self, state):
-        val, idx = max((self.card_age(val), idx) for (idx, val) in enumerate(state.hands[self.number].cards))
+        val = max((self.card_age(state, i)) for i in state.hands[self.number].cards)
+        return val
 
-    def card_age(self, state, n):
-        # n is the index of the card
-        return state.turns - state.hands[self.number].cards[n].turn_drawn
+    def card_age(self, state, c):
+        # c is the card
+        h = state.hands[self.number].cards
+        t_d = h[h.index(c)].turn_drawn
+        if t_d is None:
+            return 1
+        return state.turns - t_d

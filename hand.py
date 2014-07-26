@@ -55,6 +55,8 @@ class Hand:
         # d is the deck
         if len(state.deck.cards) > 0:
             self.cards.append(state.deck.pop_card())
+            # set age of card, essentially
+            self.cards[len(self.cards) - 1].turn_drawn = state.turns
             self.info.append([-1 for i in range(2)])
         else:
             self.size -= 1

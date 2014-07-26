@@ -63,6 +63,7 @@ def main():
         # at end of states list of game, let players rearrange hand, let players look around.
         state = game.states[curturn]
         print "----------P" + str(state.curplayer + 1) + "-----------"
+        print "Oldest Card: " + state.players[state.curplayer].oldest_card(state).to_string()
         # Censor information of player's own hand + the deck and then pass to the player for a move
         censored = copy.deepcopy(state)
         censored.hands[state.curplayer].cards = []
@@ -113,6 +114,7 @@ def main():
             for i in xrange(len(visible.deck.cards)):
                 visible.deck.cards[i] = Card(0, 0, visible.deck.cards[i].turn_drawn)
             p.scan(visible)
+
         if len(state.deck.cards) == 0:
             final_countdown -= 1
         if state.lives <= 0 or state.calc_score() == 25 or final_countdown == 0:
