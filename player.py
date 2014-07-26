@@ -11,7 +11,35 @@ class Player:
     def __init__(self, n):  # n = player number
         self.number = n
 
-    def move(self, state):  # state = current state of the game which is has player's own hand as empty list and deck as list of dummy cards (red 1s)
+    def move(self, state):
+        #Same as before, play a card if you know what it is.
+        for i in range(state.hands[self.number].size):
+            if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
+                print "Played a card."
+                return Action("play", i, None)
+        #If there are no hints left, and no playable cards, discard the oldest with no knowledge.
+        if state.hints == 0:
+            print "No hints, discarding."
+            # rearrange() should place the card we want to discard in the 0 position
+            return Action("discard", 0, None)
+        #If we can/want to give a hint, this is where that happens
+        #Analyze state, hands, and the piles to determine which cards are of most importance
+        #Next, run that card through various algorithms to see if which will clue the desire to play that card best
+        goodPlays = []
+        possDiscs = []
+        for i in range(len(state.players)):
+            if i==self.number:
+                continue
+            for j in range(state.hands[i].size):
+                if self.playable(state.hands[i].cards[j].color,state.hands[i].cards[j].number,state.stacks):
+                    goodPlays.append([i,j])
+                elif state.stacks[state.hands[i].cards[j].color] > state.hands[i].cards[j].number:
+                    #This is true if the card in question has already been played.  Then it may be clued for discard
+                    possDiscs.append([i,j])
+        for x in goodPlays:
+            x=1
+        
+    def move_old(self, state):  # state = current state of the game which is has player's own hand as empty list and deck as list of dummy cards (red 1s)
         # temporary example function
         # for i in range(len(self.cards)):
         #    if self.play_is_valid(cs, self.cards[i]):
@@ -51,7 +79,7 @@ class Player:
         print "Nothing hintable, discarding."
         # Can't do anything immediately helpful, so let's just discard cards we don't have info about. If we already have max hints, whatever.
         return Action("discard", 0, None)
-
+    
     def rearrange(self, state):  # state: same as in move()
         # Rearrange your hand if you want to
         # takes the hand into two parts - moves older cards to the left (nearer to discard) and known cards to the right (or 5's)
@@ -113,3 +141,7 @@ class Player:
         elif counter == 2:
             assert card_num == 1
             return True
+        
+    def check_uniqueness(self, state, player, position):
+        for i in state.hands[player].cards:
+            pass
