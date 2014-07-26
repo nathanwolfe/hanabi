@@ -10,10 +10,10 @@ class State:
         self.players = p  # players
         self.curplayer = cp  # whoever's turn it is
         self.action = None
-    
+
     def attach_action(self, a):  # Attaches an action to this state. For interface use only.
         self.action = a
-    
+
     def calc_score(self):
         result = 0
         for i in range(len(self.stacks)):

@@ -18,10 +18,9 @@ class Player:
         # for i in range(len(self.cards)):
         #    if self.play_is_valid(cs, self.cards[i]):
         #        return Action("play", i, None)
-        
         # If you know what a card is and it's playable, play it.
         for i in range(state.hands[self.number].size):
-            if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks) == True:
+            if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
                 print "Played a card."
                 return Action("play", i, None)
         # If there are no hints left, discard whatever you have the least info about. I could optimize this to discard less valuable cards, but I won't.
@@ -40,7 +39,7 @@ class Player:
         #print "Nothing playable."
         # If someone has something playable, hint that.
         for i in range(len(state.players)):
-            if i == self.number: 
+            if i == self.number:
                 continue
             for j in range(state.hands[i].size):
                 #print "size: " + str(len(state.hands[i].cards)) + "; " + str(j)
@@ -52,7 +51,7 @@ class Player:
                         print "Hinting number: " + str(j) + " of P" + str(i)
                         return Action("number", j, i)
         print "Nothing hintable, discarding."
-        # Can't do anything immediately helpful, so let's just discard cards we don't have info about. If we already have max hints, whatever.        
+        # Can't do anything immediately helpful, so let's just discard cards we don't have info about. If we already have max hints, whatever.
         for i in range(state.hands[self.number].size):
             if state.hands[self.number].info[i][0] == -1 and state.hands[self.number].info[i][1] == -1:
                 return Action("discard", i, None)
@@ -69,7 +68,7 @@ class Player:
     def scan(self, state):  # state: same as in move()
         # Look around if you want
         # Whatever. So hints are already recorded for us so we don't need to handle that and mostly
-        # what I can do here is record what cards are not (e.g. these two were hinted as 1, so these 
+        # what I can do here is record what cards are not (e.g. these two were hinted as 1, so these
         # two aren't 1s) but whatever.
         pass
     

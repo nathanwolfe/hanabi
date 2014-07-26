@@ -13,7 +13,6 @@ NUM_PLAYERS = 5
 
 
 def game_end(game):
-
     # add more stuff later, this is a end game clean up function.
     f = open("game_results.txt", "w")
     print "Game Over: Results"
