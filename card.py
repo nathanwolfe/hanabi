@@ -1,6 +1,6 @@
 class Card:
 
-    def __init__(self, c, n):
+    def __init__(self, c, n, t):
         # number and color should both be ints
         # number and color both range 0 through 4
         """
@@ -8,6 +8,7 @@ class Card:
         """
         self.number = n
         self.color = c
+        self.turn_drawn = t  # the turn on which this card was drawn
 
     def to_string(self):
         # with the color first because that's how you say it

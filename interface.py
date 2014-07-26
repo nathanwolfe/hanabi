@@ -9,7 +9,7 @@ import deck_generator  # this is one of our own files
 import sys
 
 HAND_SIZE = 4
-NUM_PLAYERS = 5
+NUM_PLAYERS = 2
 
 
 def game_end(game):
@@ -39,7 +39,7 @@ def setup():
     players = [Player(i) for i in range(NUM_PLAYERS)]  # initialize players
 
     # if confused see the State constructor in state.py
-    g_state = State(deck, discard_pile, lives, hints, card_stacks, hands, players, 0)
+    g_state = State(deck, discard_pile, lives, hints, card_stacks, hands, players, 0, 0)
     state_list = [g_state]
     game = Game(state_list)
     return game
@@ -67,7 +67,7 @@ def main():
         censored = copy.deepcopy(state)
         censored.hands[state.curplayer].cards = []
         for i in xrange(len(censored.deck.cards)):
-            censored.deck.cards[i] = Card(0, 0)
+            censored.deck.cards[i] = Card(0, 0, censored.deck.cards[i].turn_drawn)
         curmove = state.players[state.curplayer].move(censored)
         if curmove.type == "play":
             if not state.hands[state.curplayer].play(state, curmove.cards):
@@ -93,26 +93,26 @@ def main():
             print k.to_string()
         state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
         curturn += 1
+        state.turns = curturn
 
-        # recreate g_state and add to list of states - WILL NEED TO BE CHANGED WHEN HINT IS ADDED
-        # Why does this need to be changed? --Jerry
+        # recreate g_state and add to list of states
         game.states.append(state)
         for p in state.players:
             # censor each player's hands + the deck, then pass state for rearrangement
             visible = copy.deepcopy(state)
             visible.hands[p.number].cards = []
             for i in xrange(len(visible.deck.cards)):
-                visible.deck.cards[i] = Card(0, 0)
+                visible.deck.cards[i] = Card(0, 0, visible.deck.cards[i].turn_drawn)
                 permutation = p.rearrange(visible)
                 state.hands[p.number].rearrange(permutation)
 
-            for p in state.players:
-                # censor handss + the deck then pass for lookaround
-                visible = copy.deepcopy(state)
-                visible.hands[p.number].cards = []
-                for i in xrange(len(visible.deck.cards)):
-                    visible.deck.cards[i] = Card(0, 0)
-                p.scan(visible)
+        for p in state.players:
+            # censor handss + the deck then pass for lookaround
+            visible = copy.deepcopy(state)
+            visible.hands[p.number].cards = []
+            for i in xrange(len(visible.deck.cards)):
+                visible.deck.cards[i] = Card(0, 0, visible.deck.cards[i].turn_drawn)
+            p.scan(visible)
         if len(state.deck.cards) == 0:
             final_countdown -= 1
         if state.lives <= 0 or state.calc_score() == 25 or final_countdown == 0:

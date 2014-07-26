@@ -1,6 +1,6 @@
 class State:
-    def __init__(self, deck, disc, l, h, s, hands, p, cp):
-        # d = Deck, disc = list, l = int, hcount = int, s = list, hands = list of hand objects, p = list of players, cp = current player
+    def __init__(self, deck, disc, l, h, s, hands, p, cp, t):
+        # d = Deck, disc = list, l = int, hcount = int, s = list, hands = list of hand objects, p = list of players, cp = current player, t = turns passed
         self.deck = deck
         self.discards = disc
         self.lives = l
@@ -9,6 +9,7 @@ class State:
         self.hands = hands  # list of Hand objects
         self.players = p  # players
         self.curplayer = cp  # whoever's turn it is
+        self.turns = t  # how many turns have passed?
         self.action = None
 
     def attach_action(self, a):  # Attaches an action to this state. For interface use only.
