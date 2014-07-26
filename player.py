@@ -12,13 +12,17 @@ This is an example player file. AI developers should be able to specify their ow
 class Player:
     def __init__(self, n):  # n = player number
         self.number = n
+        # queue is card to be played
+        self.queue = []
 
     def move(self, state):  # state = current state of the game which is has player's own hand as empty list and deck as list of dummy cards (red 1s)
         # temporary example function
         # for i in range(len(self.cards)):
         #    if self.play_is_valid(cs, self.cards[i]):
         #        return Action("play", i, None)
-        
+        # If there's anything in the queue, play it.
+        if len(self.queue) > 0:
+            return Action("play", self.queue.pop(0), None)
         # If you know what a card is and it's playable, play it.
         for i in range(state.hands[self.number].size):
             if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks) == True:
@@ -38,6 +42,19 @@ class Player:
             # Whatever, let's just discard something.
             return Action("discard", 0, None)
         #print "Nothing playable."
+        # If someone has something playable that can be hinted unambiguously, hint that.
+        for i in range(len(state.players)):
+            if i == self.number: 
+                continue
+            for j in range(state.hands[i].size):
+                #print "size: " + str(len(state.hands[i].cards)) + "; " + str(j)
+                if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
+                    if state.hands[i].info[j][0] == -1 and self.unique(state.hands[i].cards[j].color, state.hands[i].cards, 0):
+                        print "Hinting color: " + str(j) + " of P" + str(i)
+                        return Action("color", j, i)
+                    if state.hands[i].info[j][1] == -1 and self.unique(state.hands[i].cards[j].number, state.hands[i].cards, 1):
+                        print "Hinting number: " + str(j) + " of P" + str(i)
+                        return Action("number", j, i)
         # If someone has something playable, hint that.
         for i in range(len(state.players)):
             if i == self.number: 
@@ -68,10 +85,13 @@ class Player:
 
     def scan(self, state):  # state: same as in move()
         # Look around if you want
-        # Whatever. So hints are already recorded for us so we don't need to handle that and mostly
-        # what I can do here is record what cards are not (e.g. these two were hinted as 1, so these 
-        # two aren't 1s) but whatever.
-        pass
+        # If someone hinted this player unambiguously, add that to a queue.
+        if (state.action.type == "number" or state.action.type == "color") and state.action.player == self.number and len(state.action.cards) == 1:
+            self.queue.append(state.action.cards[0])
+        # If someone played a card, clear the queue since it might not be playable. (This could be optimized but w/e.)
+        if state.action.type == "play":
+            self.queue = []
+        
     
     # This function isn't required; I'm implementing this to make things easier
     def playable(self, color, number, stacks):  # Is the card guaranteed playable on stacks (list)?
@@ -83,3 +103,13 @@ class Player:
             return True
         else:
             return False
+    
+    def unique(self, value, cards, type):  # Checks uniqueness of a value in a hand.
+        #type = 0 -> color, type = 1 -> number
+        num = 0
+        for card in cards:
+            if (type == 0 and value == card.color) or (type == 1 and value == card.number):
+                num += 1
+        if num == 1:
+            return True
+        return False

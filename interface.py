@@ -13,7 +13,6 @@ NUM_PLAYERS = 5
 
 
 def game_end(game):
-
     # add more stuff later, this is a end game clean up function.
     f = open("game_results.txt", "w")
     print "Game Over: Results"
@@ -117,5 +116,7 @@ def main():
         if len(state.deck.cards) == 0:
             final_countdown -= 1
         if state.lives <= 0 or state.calc_score() == 25 or final_countdown == 0:
+            if state.lives <= 0:
+                print "Game lost."
             game_end(game)
 main()
