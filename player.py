@@ -50,12 +50,6 @@ class Player:
                         return Action("number", j, i)
         print "Nothing hintable, discarding."
         # Can't do anything immediately helpful, so let's just discard cards we don't have info about. If we already have max hints, whatever.
-        for i in range(state.hands[self.number].size):
-            if state.hands[self.number].info[i][0] == -1 and state.hands[self.number].info[i][1] == -1:
-                return Action("discard", i, None)
-        for i in range(state.hands[self.number].size):
-            if state.hands[self.number].info[i][0] == -1 or state.hands[self.number].info[i][1] == -1:
-                return Action("discard", i, None)
         return Action("discard", 0, None)
 
     def rearrange(self, state):  # state: same as in move()
@@ -64,7 +58,7 @@ class Player:
         move_right = []
         move_left = []
         for i in range(state.hands[self.number].size):
-            if (not state.hands[self.number].info[i][0] == -1 and not state.hands[self.number].info[i][1] == -1) or state.hands[self.number].info[i][1] == 5:
+            if (not state.hands[self.number].info[i][0] == -1 and not state.hands[self.number].info[i][1] == -1) or self.is_last(state, i):
                 move_right.append(i)
             else:
                 move_left.append(i)
@@ -101,6 +95,9 @@ class Player:
         card_num = state.hands[self.number].info[n][1]
         counter = 0
 
+        if card_num == 4:
+            return True
+
         for i in state.discards:
             if i.color == card_color and i.number == card_num:
                 counter += 1
@@ -109,7 +106,6 @@ class Player:
         if counter == 0:
             return False
         elif counter == 1:
-            assert not card_num == 4
             if card_num == 1 or card_num == 2 or card_num == 3:
                 return False
             elif card_num == 0:
