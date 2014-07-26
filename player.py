@@ -60,7 +60,15 @@ class Player:
 
     def rearrange(self, state):  # state: same as in move()
         # Rearrange your hand if you want to
-        # This is the default permutation.
+        move_right = []
+        move_left = []
+        print len(state.hands[self.number].cards)
+        """
+        for i in range(state.hands[self.number].size):
+            if not state.hands[self.number].info[i][0] == -1 and not state.hands[self.number].info[i][1] == -1 or state.hands[self.number].info[i][1] == 5:
+                move_right.append(state.hands[self.number].cards[i])
+        return move_left + move_right
+        """
         return [i for i in range(state.hands[self.number].size)]
 
     def scan(self, state):  # state: same as in move()
