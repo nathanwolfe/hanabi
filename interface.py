@@ -79,13 +79,13 @@ def main():
                 state.hints += 1
         elif curmove.type == "color":
             hinted = state.hands[curmove.player].hint(curmove.cards, "color")
-            assert state.hints > 0, "Tried to hint when out of hints: player " + str(state.curplayer)
+            assert state.hints > 0, "Tried to hint when out of hints: player " + str(state.curplayer + 1)
             state.hints -= 1
             curmove.cards = hinted  # Before attaching, correct the action to list all cards hinted
         else:
             assert curmove.type == "number", "invalid move string specified"
             hinted = state.hands[curmove.player].hint(curmove.cards, "number")
-            assert state.hints > 0, "Tried to hint when out of hints: player " + str(state.curplayer)
+            assert state.hints > 0, "Tried to hint when out of hints: player " + str(state.curplayer + 1)
             state.hints -= 1
             curmove.cards = hinted
         state.attach_action(curmove)
@@ -104,8 +104,8 @@ def main():
             visible.hands[p.number].cards = []
             for i in xrange(len(visible.deck.cards)):
                 visible.deck.cards[i] = Card(0, 0, visible.deck.cards[i].turn_drawn)
-                permutation = p.rearrange(visible)
-                state.hands[p.number].rearrange(permutation)
+            permutation = p.rearrange(visible)
+            state.hands[p.number].rearrange(permutation)
 
         for p in state.players:
             # censor handss + the deck then pass for lookaround

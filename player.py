@@ -43,33 +43,27 @@ class Player:
                 #print "size: " + str(len(state.hands[i].cards)) + "; " + str(j)
                 if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
                     if state.hands[i].info[j][0] == -1:
-                        print "Hinting color: " + str(j) + " of P" + str(i)
-                        return Action("color", j, i)
+                        print "Hinting color: " + str(j) + " of P" + str(i + 1)
+                    return Action("color", j, i)
                     if state.hands[i].info[j][1] == -1:
-                        print "Hinting number: " + str(j) + " of P" + str(i)
+                        print "Hinting number: " + str(j) + " of P" + str(i + 1)
                         return Action("number", j, i)
         print "Nothing hintable, discarding."
         # Can't do anything immediately helpful, so let's just discard cards we don't have info about. If we already have max hints, whatever.
-        for i in range(state.hands[self.number].size):
-            if state.hands[self.number].info[i][0] == -1 and state.hands[self.number].info[i][1] == -1:
-                return Action("discard", i, None)
-        for i in range(state.hands[self.number].size):
-            if state.hands[self.number].info[i][0] == -1 or state.hands[self.number].info[i][1] == -1:
-                return Action("discard", i, None)
         return Action("discard", 0, None)
 
     def rearrange(self, state):  # state: same as in move()
         # Rearrange your hand if you want to
+        # takes the hand into two parts - moves older cards to the left (nearer to discard) and known cards to the right (or 5's)
         move_right = []
         move_left = []
         print len(state.hands[self.number].cards)
-        """
         for i in range(state.hands[self.number].size):
             if not state.hands[self.number].info[i][0] == -1 and not state.hands[self.number].info[i][1] == -1 or state.hands[self.number].info[i][1] == 5:
-                move_right.append(state.hands[self.number].cards[i])
+                move_right.append(i)
+            else:
+                move_left.append(i)
         return move_left + move_right
-        """
-        return [i for i in range(state.hands[self.number].size)]
 
     def scan(self, state):  # state: same as in move()
         # Look around if you want
