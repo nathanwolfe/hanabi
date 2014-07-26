@@ -1,7 +1,7 @@
 from card import Card
 from deck import Deck
 from action import Action
-
+from operator import attrgetter
 """
 This is an example player file. AI developers should be able to specify their own players later.
 """
@@ -81,19 +81,9 @@ class Player:
         else:
             return False
 
+    # these took a while make surprisingly.
     def newest_card(self, state):
-        # try not to understand this line...andrew is a sleepy boy right now
-        val = min((self.card_age(state, i)) for i in state.hands[self.number].cards)
-        return val
+        return max(state.hands[self.number].cards, key=attrgetter("turn_drawn"))
 
     def oldest_card(self, state):
-        val = max((self.card_age(state, i)) for i in state.hands[self.number].cards)
-        return val
-
-    def card_age(self, state, c):
-        # c is the card
-        h = state.hands[self.number].cards
-        t_d = h[h.index(c)].turn_drawn
-        if t_d is None:
-            return 1
-        return state.turns - t_d
+        return min(state.hands[self.number].cards, key=attrgetter("turn_drawn"))

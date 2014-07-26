@@ -8,7 +8,7 @@ import copy
 import deck_generator  # this is one of our own files
 import sys
 
-HAND_SIZE = 4
+HAND_SIZE = 5
 NUM_PLAYERS = 2
 
 
@@ -63,7 +63,7 @@ def main():
         # at end of states list of game, let players rearrange hand, let players look around.
         state = game.states[curturn]
         print "----------P" + str(state.curplayer + 1) + "-----------"
-        print "Oldest Card: " + state.players[state.curplayer].oldest_card(state).to_string()
+        # print "Oldest Card: " + state.players[state.curplayer].oldest_card(state).to_string()
         # Censor information of player's own hand + the deck and then pass to the player for a move
         censored = copy.deepcopy(state)
         censored.hands[state.curplayer].cards = []
