@@ -28,17 +28,18 @@ class Player:
         goodPlays = []
         possDiscs = []
         for i in range(len(state.players)):
-            if i==self.number:
+            if i == self.number:
                 continue
             for j in range(state.hands[i].size):
-                if self.playable(state.hands[i].cards[j].color,state.hands[i].cards[j].number,state.stacks):
-                    goodPlays.append([i,j])
+                if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
+                    goodPlays.append([i, j])
                 elif state.stacks[state.hands[i].cards[j].color] > state.hands[i].cards[j].number:
                     #This is true if the card in question has already been played.  Then it may be clued for discard
-                    possDiscs.append([i,j])
+                    possDiscs.append([i, j])
+        # what does this do...?
         for x in goodPlays:
-            x=1
-        
+            pass
+
     def move_old(self, state):  # state = current state of the game which is has player's own hand as empty list and deck as list of dummy cards (red 1s)
         # temporary example function
         # for i in range(len(self.cards)):
@@ -92,14 +93,6 @@ class Player:
                 move_left.append(i)
         return move_left + move_right
 
-    def scan(self, state):  # state: same as in move()
-        # Look around if you want
-        # Whatever. So hints are already recorded for us so we don't need to handle that and mostly
-        # what I can do here is record what cards are not (e.g. these two were hinted as 1, so these
-        # two aren't 1s) but whatever.
-        pass
-    
-    # This function isn't required; I'm implementing this to make things easier
     def playable(self, color, number, stacks):  # Is the card guaranteed playable on stacks (list)?
         # color and number should be -1 if unknown
         # print str(color) + " " + str(number) + " -> " + str(stacks[color]) + " " + str(number)
@@ -119,12 +112,20 @@ class Player:
 
     def is_last(self, state, n):
         # function determines whether a card is the last of its kind
+        # NOTE: If the card is a red 1, and a red 1 has been successfully played in the past, this will still return FALSE even if this is the last red 1
         card_color = state.hands[self.number].info[n][0]
         card_num = state.hands[self.number].info[n][1]
         counter = 0
 
+        if card_color == -1 or card_num == -1:
+            return False
+
         if card_num == 4:
             return True
+
+        # if card is smaller than the highest card played of its color (see function comments)
+        if card_num < state.stacks[card_color]:
+            return False
 
         for i in state.discards:
             if i.color == card_color and i.number == card_num:
@@ -141,7 +142,3 @@ class Player:
         elif counter == 2:
             assert card_num == 1
             return True
-        
-    def check_uniqueness(self, state, player, position):
-        for i in state.hands[player].cards:
-            pass
