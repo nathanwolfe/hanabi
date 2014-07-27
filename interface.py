@@ -69,7 +69,7 @@ def main():
         censored.hands[state.curplayer].cards = []
         for i in xrange(len(censored.deck.cards)):
             censored.deck.cards[i] = Card(0, 0, censored.deck.cards[i].turn_drawn)
-        curmove = state.players[state.curplayer].move(censored)
+        curmove = state.players[state.curplayer].move(censored, NUM_PLAYERS)
         if curmove.type == "play":
             if not state.hands[state.curplayer].play(state, curmove.cards):
                 state.lives -= 1
