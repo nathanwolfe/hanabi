@@ -14,19 +14,30 @@ class Player:
     def move(self, state, nplayers):
         nextplayer = (state.curplayer + 1) % nplayers
         self.rearrange()
-        if state.hints > 0:
-            if state.players[nextplayer].is_last(state, 0):
-                print "Critical hint given"
-                return Action("number", 0, nextplayer)
+        if state.hints > 0 and state.players[nextplayer].is_last(state, 0):
+            print "Critical hint given"
+            return Action("number", 0, nextplayer)
         # Same as before, play a card if you know what it is.
         for i in range(state.hands[self.number].size):
             if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
                 print "Played a card."
                 return Action("play", i, None)
+        # Extended play: basically, checks the number of cards that are the same color; if two or more cards are the same color, the AI will play the newest card with that color. curcolor = number referring to current color; colnumbers = list of curcolor values for each color
         curcolor = 0
         colnumbers = [0 for i in state.hands[self.number].size]
-        for i in range(len(state.hands[self.number].info))
-            if state.hands[self.number].card
+        while curcolor <= 4:
+            for j in range(len(state.hands[self.number].info)):
+                if state.hands[self.number].info[j][0] == curcolor:
+                    colnumbers[curcolor] += 1
+            # optimization idea: make AI think through all possibilities before deciding what to play
+            if colnumbers[curcolor] >= 2:
+                colcards = []
+                for k in range(len(state.hands[self.number].size)):
+                    c = state.hands[self.number].cards[k]
+                    if c.color == curcolor:
+                        colcards.append(c)
+                return Action("play", self.newest_card(colcards), None)
+            curcolor += 1
         # If there are no hints left, and no playable cards, discard the oldest with no knowledge.
         if state.hints == 0:
             print "No hints, discarding."
