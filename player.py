@@ -13,7 +13,7 @@ class Player:
 
     def move(self, state, nplayers):
         nextplayer = (state.curplayer + 1) % nplayers
-        self.rearrange()
+        self.rearrange(state)
         if state.hints > 0 and state.players[nextplayer].is_last(state, 0):
             print "Critical hint given"
             return Action("number", 0, nextplayer)
@@ -24,7 +24,7 @@ class Player:
                 return Action("play", i, None)
         # Extended play: basically, checks the number of cards that are the same color; if two or more cards are the same color, the AI will play the newest card with that color. curcolor = number referring to current color; colnumbers = list of curcolor values for each color
         curcolor = 0
-        colnumbers = [0 for i in state.hands[self.number].size]
+        colnumbers = [0, 0, 0, 0, 0]
         while curcolor <= 4:
             for j in range(len(state.hands[self.number].info)):
                 if state.hands[self.number].info[j][0] == curcolor:
