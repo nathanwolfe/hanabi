@@ -103,7 +103,19 @@ class Player:
                 move_left.append(i)
         return move_left + move_right
 
-    def playable(self, color, number, stacks):  # Is the card guaranteed playable on stacks (list)?
+    def find_playable(self, state):
+        playable_cards = []
+        # h is a number, c is a number
+        for h in range(len(state.hands)):
+            if h == self.number:
+                continue
+            for c in range(state.hands[h].size):
+                if self.playable(state.hands[h].cards[c].color, state.hands[h].cards[c].number, state.stacks):
+                    playable_cards.append([h, c])
+        return playable_cards
+
+    def playable(self, color, number, stacks):
+        # Is the card guaranteed playable on stacks (list)?
         # color and number should be -1 if unknown
         # print str(color) + " " + str(number) + " -> " + str(stacks[color]) + " " + str(number)
         if color == -1 or number == -1:
@@ -113,12 +125,11 @@ class Player:
         else:
             return False
 
-    # these took a while to make surprisingly.
-    def newest_card(self, state):
-        return max(state.hands[self.number].cards, key=attrgetter("turn_drawn"))
+    def newest_card(self, cards):
+        return max(cards, key=attrgetter("turn_drawn"))
 
-    def oldest_card(self, state):
-        return min(state.hands[self.number].cards, key=attrgetter("turn_drawn"))
+    def oldest_card(self, cards):
+        return min(cards, key=attrgetter("turn_drawn"))
 
     def is_last(self, state, n):
         # function determines whether a card is the last of its kind
@@ -129,14 +140,11 @@ class Player:
 
         if card_color == -1 or card_num == -1:
             return False
-
         if card_num == 4:
             return True
-
         # if card is smaller than the highest card played of its color (see function comments)
         if card_num < state.stacks[card_color]:
             return False
-
         for i in state.discards:
             if i.color == card_color and i.number == card_num:
                 counter += 1
