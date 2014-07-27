@@ -132,6 +132,7 @@ class Player:
                 counter += 1
 
         assert counter <= 2
+        # this stuff basically counts # of cards
         if counter == 0:
             return False
         elif counter == 1:
