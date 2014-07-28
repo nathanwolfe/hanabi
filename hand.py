@@ -14,6 +14,8 @@ class Hand:
         self.draw(state)  # this needs to go first since this function actually returns stuff
         if self.is_valid(n, state):
             state.stacks[self.cards[n].color] += 1
+            if state.stacks[self.cards[n].color] == 5 and state.hints < 8:
+                state.hints += 1
             self.cards.pop(n)
             self.info.pop(n)
             return True
