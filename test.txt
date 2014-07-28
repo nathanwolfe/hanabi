@@ -1,449 +1,449 @@
 ----------P1-----------
-g 4
-r 3
-w 4
-r 2
-g 1
+b 1
+g 3
+b 2
+y 1
+r 4
 ----------P2-----------
-w 1
-y 4
-r 3
-w 1
-g 4
-----------P1-----------
-hinting color 0; newest card is playable
-g 4
-r 3
-w 4
 r 2
-g 1
-----------P2-----------
-hinting a number0, all cards of which are playable
-w 1
-y 4
-r 3
-w 1
+b 3
+b 2
 g 4
+r 5
 ----------P1-----------
-Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 0]]
-g 4
-r 3
-w 4
-r 2
-r 1
-----------P2-----------
-hinting a number0, all cards of which are playable
-w 1
-y 4
-r 3
-w 1
-g 4
-----------P1-----------
-Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 0]]
-g 4
-r 3
-w 4
-r 2
+Nothing else to do; discarding
+g 3
+b 2
+y 1
+r 4
 b 1
 ----------P2-----------
 hinting a number0, all cards of which are playable
-w 1
-y 4
-r 3
-w 1
-g 4
-----------P1-----------
-Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 0]]
-g 4
-r 3
-w 4
 r 2
-w 4
-----------P2-----------
-hinting a number1, all cards of which are playable
-w 1
-y 4
-r 3
-w 1
-g 4
-----------P1-----------
-Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, -1], [-1, 1], [-1, -1]]
-g 4
-r 3
-w 4
-w 4
+b 3
 b 2
-----------P2-----------
-hinting a number1, all cards of which are playable
-w 1
-y 4
-r 3
-w 1
 g 4
+r 5
 ----------P1-----------
 Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 1]]
-g 4
-r 3
-w 4
-w 4
-y 1
+[[-1, -1], [-1, -1], [-1, 0], [-1, -1], [-1, 0]]
+g 3
+b 2
+r 4
+b 1
+w 2
 ----------P2-----------
 hinting a number0, all cards of which are playable
-w 1
-y 4
-r 3
-w 1
+r 2
+b 3
+b 2
 g 4
+r 5
 ----------P1-----------
 Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 0]]
+[[-1, -1], [-1, -1], [-1, -1], [-1, 0], [-1, -1]]
+g 3
+b 2
+r 4
+w 2
+w 3
+----------P2-----------
+Nothing else to do; discarding
+b 3
+b 2
 g 4
-r 3
+r 5
+w 1
+----------P1-----------
+hinting a number0, all cards of which are playable
+g 3
+b 2
+r 4
+w 2
+w 3
+----------P2-----------
+Played a card, only knew number.
+[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 0]]
+b 3
+b 2
+g 4
+r 5
+w 5
+----------P1-----------
+hinting a number1, all cards of which are playable
+g 3
+b 2
+r 4
+w 2
+w 3
+----------P2-----------
+Played a card, only knew number.
+[[-1, -1], [-1, 1], [-1, -1], [-1, -1], [-1, -1]]
+b 3
+g 4
+r 5
+w 5
+g 1
+----------P1-----------
+hinting a number0, all cards of which are playable
+g 3
+b 2
+r 4
+w 2
+w 3
+----------P2-----------
+Played a card, only knew number.
+[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 0]]
+b 3
+g 4
+r 5
+w 5
 w 4
+----------P1-----------
+hinting a number2, all cards of which are playable
+g 3
+b 2
+r 4
+w 2
+w 3
+----------P2-----------
+Played a card, only knew number.
+[[-1, 2], [-1, -1], [-1, -1], [-1, -1], [-1, -1]]
+g 4
+r 5
+w 5
 w 4
-r 1
+y 5
+----------P1-----------
+Nothing else to do; discarding
+b 2
+r 4
+w 2
+w 3
+b 5
+----------P2-----------
+Nothing else to do; discarding
+r 5
+w 5
+w 4
+y 5
+g 1
+----------P1-----------
+Nothing else to do; discarding
+r 4
+w 2
+w 3
+b 5
+y 1
+----------P2-----------
+hinting a number1, all cards of which are playable
+r 5
+w 5
+w 4
+y 5
+g 1
+----------P1-----------
+Played a card, only knew number.
+[[-1, -1], [-1, 1], [-1, -1], [-1, -1], [-1, -1]]
+r 4
+w 3
+b 5
+y 1
+b 1
 ----------P2-----------
 hinting a number2, all cards of which are playable
-w 1
-y 4
-r 3
-w 1
-g 4
+r 5
+w 5
+w 4
+y 5
+g 1
 ----------P1-----------
 Played a card, only knew number.
 [[-1, -1], [-1, 2], [-1, -1], [-1, -1], [-1, -1]]
-g 4
-w 4
-w 4
-r 1
-y 5
-----------P2-----------
-No hints, discarding.
-y 4
-r 3
-w 1
-g 4
-g 2
-----------P1-----------
-hinting a number0, all cards of which are playable
-g 4
-w 4
-w 4
-r 1
-y 5
-----------P2-----------
-Played a card.
-y 4
-r 3
-g 4
-g 2
+r 4
+b 5
 y 1
-----------P1-----------
-No hints, discarding.
-w 4
-w 4
-r 1
-y 5
 b 1
+g 2
+----------P2-----------
+hinting a number1, all cards of which are playable
+r 5
+w 5
+w 4
+y 5
+g 1
+----------P1-----------
+Played a card, only knew number.
+[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 1]]
+r 4
+b 5
+y 1
+b 1
+g 1
 ----------P2-----------
 Nothing else to do; discarding
-r 3
-g 4
-g 2
+w 5
+w 4
+y 5
+g 1
+y 1
+----------P1-----------
+hinting a number3, all cards of which are playable
+r 4
+b 5
 y 1
 b 1
-----------P1-----------
-hinting a number1, all cards of which are playable
-w 4
-w 4
-r 1
-y 5
-b 1
+g 1
 ----------P2-----------
 Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, 1], [-1, -1], [-1, -1]]
-r 3
-g 4
+[[-1, -1], [-1, 3], [-1, -1], [-1, -1], [-1, -1]]
+w 5
+y 5
+g 1
 y 1
-b 1
-b 3
+r 1
 ----------P1-----------
 hinting color 4; newest card is playable
-w 4
-w 4
-r 1
-y 5
-b 1
-----------P2-----------
-No hints, discarding.
-g 4
+r 4
+b 5
 y 1
 b 1
-b 3
-w 2
+g 1
+----------P2-----------
+Nothing else to do; discarding
+y 5
+g 1
+y 1
+r 1
+r 3
 ----------P1-----------
-hinting a number1, all cards of which are playable
-w 4
-w 4
-r 1
-y 5
-b 1
-----------P2-----------
-Played a card, only knew number.
-[[-1, -1], [-1, -1], [3, -1], [3, -1], [-1, 1]]
-g 4
+Nothing else to do; discarding
+b 5
 y 1
 b 1
-b 3
+g 1
 g 2
-----------P1-----------
-No hints, discarding.
-w 4
-r 1
-y 5
-b 1
-w 2
 ----------P2-----------
+Nothing else to do; discarding
+g 1
+y 1
+r 1
+r 3
+w 4
+----------P1-----------
 Nothing else to do; discarding
 y 1
 b 1
-b 3
+g 1
 g 2
-y 2
-----------P1-----------
-hinting a number2, all cards of which are playable
-w 4
+y 3
+----------P2-----------
+Nothing else to do; discarding
+y 1
 r 1
-y 5
+r 3
+w 4
+w 3
+----------P1-----------
+Nothing else to do; discarding
 b 1
-w 2
+g 1
+g 2
+y 3
+r 1
+----------P2-----------
+hinting color 4; newest card is playable
+y 1
+r 1
+r 3
+w 4
+w 3
+----------P1-----------
+Nothing else to do; discarding
+g 1
+g 2
+y 3
+r 1
+y 4
+----------P2-----------
+Nothing else to do; discarding
+r 1
+r 3
+w 4
+w 3
+r 3
+----------P1-----------
+hinting a number0, all cards of which are playable
+g 1
+g 2
+y 3
+r 1
+y 4
 ----------P2-----------
 Played a card.
-y 1
-b 1
-g 2
-y 2
-g 3
-----------P1-----------
-hinting a number2, all cards of which are playable
+r 3
 w 4
+w 3
+r 3
+y 2
+----------P1-----------
+hinting a number1, all cards of which are playable
+g 1
+g 2
+y 3
 r 1
-y 5
-b 1
-w 2
+y 4
 ----------P2-----------
 Played a card, only knew number.
-[[-1, -1], [3, -1], [-1, -1], [-1, -1], [-1, 2]]
-y 1
-b 1
-g 2
-y 2
-y 2
-----------P1-----------
-No hints, discarding.
+[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 1]]
+r 3
+w 4
+w 3
+r 3
 r 1
-y 5
-b 1
-w 2
-b 3
-----------P2-----------
-Nothing else to do; discarding
-b 1
-g 2
-y 2
-y 2
-b 5
 ----------P1-----------
 Nothing else to do; discarding
-y 5
-b 1
-w 2
-b 3
+g 2
+y 3
+r 1
+y 4
+w 1
+----------P2-----------
+hinting a number2, all cards of which are playable
+r 3
+w 4
+w 3
+r 3
+r 1
+----------P1-----------
+Played a card, only knew number.
+[[-1, -1], [-1, 2], [0, -1], [-1, -1], [-1, -1]]
+g 2
+r 1
+y 4
+w 1
 b 4
 ----------P2-----------
 hinting a number3, all cards of which are playable
-b 1
-g 2
-y 2
-y 2
-b 5
-----------P1-----------
-Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 3]]
-y 5
-b 1
-w 2
-b 3
-r 1
-----------P2-----------
-Nothing else to do; discarding
-g 2
-y 2
-y 2
-b 5
-g 1
-----------P1-----------
-hinting a number4, all cards of which are playable
-y 5
-b 1
-w 2
-b 3
-r 1
-----------P2-----------
-Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, -1], [-1, 4], [-1, -1]]
-g 2
-y 2
-y 2
-g 1
-r 4
-----------P1-----------
-hinting a number3, all cards of which are playable
-y 5
-b 1
-w 2
-b 3
-r 1
-----------P2-----------
-Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 3]]
-g 2
-y 2
-y 2
-g 1
-y 4
-----------P1-----------
-Nothing else to do; discarding
-b 1
-w 2
-b 3
-r 1
-r 4
-----------P2-----------
-Nothing else to do; discarding
-y 2
-y 2
-g 1
-y 4
-g 1
-----------P1-----------
-Nothing else to do; discarding
-w 2
-b 3
-r 1
-r 4
-y 3
-----------P2-----------
-Nothing else to do; discarding
-y 2
-g 1
-y 4
-g 1
-r 2
-----------P1-----------
-Nothing else to do; discarding
-b 3
-r 1
-r 4
-y 3
-y 3
-----------P2-----------
-Nothing else to do; discarding
-g 1
-y 4
-g 1
-r 2
-y 1
-----------P1-----------
-Nothing else to do; discarding
-r 1
-r 4
-y 3
-y 3
-w 5
-----------P2-----------
-Nothing else to do; discarding
-y 4
-g 1
-r 2
-y 1
+r 3
+w 4
 w 3
+r 3
+r 1
+----------P1-----------
+Played a card, only knew number.
+[[-1, -1], [0, -1], [-1, 3], [-1, -1], [-1, 3]]
+g 2
+r 1
+w 1
+b 4
+y 2
+----------P2-----------
+hinting a number3, all cards of which are playable
+r 3
+w 4
+w 3
+r 3
+r 1
+----------P1-----------
+Played a card, only knew number.
+[[-1, -1], [0, -1], [-1, -1], [-1, 3], [-1, -1]]
+g 2
+r 1
+w 1
+y 2
+y 4
+----------P2-----------
+Nothing else to do; discarding
+w 4
+w 3
+r 3
+r 1
+g 5
+----------P1-----------
+Nothing else to do; discarding
+r 1
+w 1
+y 2
+y 4
+b 3
+----------P2-----------
+Nothing else to do; discarding
+w 3
+r 3
+r 1
+g 5
+g 4
+----------P1-----------
+Nothing else to do; discarding
+w 1
+y 2
+y 4
+b 3
+w 1
+----------P2-----------
+Nothing else to do; discarding
+r 3
+r 1
+g 5
+g 4
+g 3
+----------P1-----------
+hinting color 4; newest card is playable
+w 1
+y 2
+y 4
+b 3
+w 1
+----------P2-----------
+Nothing else to do; discarding
+r 1
+g 5
+g 4
+g 3
+b 4
 ----------P1-----------
 hinting a number2, all cards of which are playable
-r 1
-r 4
-y 3
-y 3
-w 5
-----------P2-----------
-Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 2]]
+w 1
+y 2
 y 4
-g 1
-r 2
-y 1
-r 5
-----------P1-----------
-hinting a number4, all cards of which are playable
+b 3
+w 1
+----------P2-----------
+Played a card.
 r 1
+g 5
+g 4
+b 4
 r 4
-y 3
-y 3
-w 5
-----------P2-----------
-Played a card, only knew number.
-[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, 4]]
+----------P1-----------
+Nothing else to do; discarding
+y 2
 y 4
-g 1
-r 2
-y 1
-w 3
-----------P1-----------
+b 3
+w 1
+y 3
+----------P2-----------
 Nothing else to do; discarding
+g 5
+g 4
+b 4
 r 4
-y 3
-y 3
-w 5
-b 4
-----------P2-----------
-Nothing else to do; discarding
-g 1
-r 2
-y 1
-w 3
-w 1
+w 2
 ----------P1-----------
 Nothing else to do; discarding
+y 4
+b 3
+w 1
 y 3
-y 3
-w 5
-b 4
-b 2
-----------P2-----------
-Nothing else to do; discarding
 r 2
-y 1
-w 3
-w 1
-g 5
-----------P1-----------
-Nothing else to do; discarding
-y 3
-w 5
-b 4
-b 2
-g 3
 ----------P2-----------
-Nothing else to do; discarding
-y 1
-w 3
-w 1
+hinting a number1, all cards of which are playable
 g 5
+g 4
+b 4
+r 4
+w 2
 Game Over: Results
-[5, 1, 3, 5, 3]
-17
+[1, 4, 3, 4, 4]
+16
