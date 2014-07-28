@@ -13,30 +13,36 @@ class Player:
         self.hintlist = []  # we need a list of hints because the info list doesn't provide any information about how recent that info was obtained. Hintlist is a list of duples [p, a] where p is the index of the player giving the hint and a is an action.
 
     def move(self, state, nplayers):
-        #knownlist = []
-        #for i in range(state.hands[self.number].size):
-            #if state.hands[self.number].info[i][0] != -1 or state.hands[self.number].info[i][1] != -1:
-                #knownlist.append[i]
-        
-        #nextplayer = (state.curplayer + 1) % nplayers
-        #if state.hints > 0 and state.players[nextplayer].is_last(state, 0):
-            #print "Critical hint given"
-            #a = Action("number", 0, nextplayer)
-            #state.players[nextplayer].hintlist.append([self.number, a])
-            #returna
         # Same as before, play a card if you know what it is.
         for i in range(state.hands[self.number].size):
             if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
                 print "Played a card."
                 return Action("play", i, None)
             if state.hands[self.number].info[i][1] != -1:
-            #for j in range(len(state.stacks)):
-            #for j in range(5):
-             #   if self.playable(j, state.hands[self.number].info[i][1], state.stacks):  # state.stacks[j] == state.hands[self.number].info[i][1]:
+            # for j in range(len(state.stacks)):
+            # for j in range(5):
+                # if self.playable(j, state.hands[self.number].info[i][1], state.stacks):  # state.stacks[j] == state.hands[self.number].info[i][1]:
                 print "Played a card, only knew number."
                 print str(state.hands[self.number].info)
                 return Action("play", i, None)
-        # Extended play: basically, checks the number of cards that are the same color; if two or more cards are the same color, the AI will play the newest card with that color. curcolor = number referring to current color; colnumbers = list of curcolor values for each color
+
+        """
+        last_hints = self.hintlist[max(0, len(self.hintlist) - nplayers):]  # look back at most nplayers many hints
+        for i in range(len(last_hints)):
+            curhint = last_hints[i]
+            if curhint.type == "color" and curhint.player == self.number:  # if the hint is of type color and pertains to us
+                # optimize from which color group a card is played later...
+                colcards = []
+                for j in range(state.hands[self.number].size):  # look at all the cards of the same color as the hint
+                    if state.hands[self.number].info[j][0] == state.hands[self.number].info[curhint.cards[0]][0]:  # look carefully
+                        colcards.append(state.hands[self.number].cards[j])
+                if len(colcards) > 0:  # make sure at least 1 of that color
+                    print "played newest card of color " + str(state.hands[self.number].info[curhint.cards[0]][0])
+                    print state.hands[self.number].info
+                    return Action("play", state.hands[self.number].cards.index(self.newest_card(colcards)), None)
+
+        """
+        # If was hinted _last round_ in color form, play newest card
         curcolor = 0
         colnumbers = [0, 0, 0, 0, 0]
         while curcolor <= 4:
@@ -53,6 +59,7 @@ class Player:
                 )
             # optimization idea: make AI think through all possibilities before deciding what to play
             curcolor += 1
+
         # If there are no hints left, and no playable cards, discard the oldest with no knowledge.
         if state.hints == 0:
             print "No hints, discarding."
@@ -102,7 +109,7 @@ class Player:
             if state.hands[maxindex[0]].cards[i].number == maxindex[1]:
                 cardindex = i
                 break
-            
+
         #maxvalues = map(max, sizelist)
         #maxindices = [sizelist[i].index(max(sizelist[i])) for i in range(len(sizelist))]
         #hintplayer = maxindices[maxvalues.index(max(maxvalues))]
@@ -142,47 +149,6 @@ class Player:
 
         # If there is nothing else to do, discard the oldest card.
         print "Nothing else to do; discarding"
-        return Action("discard", 0, None)
-
-    def move_old(self, state):  # state = current state of the game which is has player's own hand as empty list and deck as list of dummy cards (red 1s)
-        # temporary example function
-        # for i in range(len(self.cards)):
-        #    if self.play_is_valid(cs, self.cards[i]):
-        #        return Action("play", i, None)
-        # If you know what a card is and it's playable, play it.
-        for i in range(state.hands[self.number].size):
-            if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
-                print "Played a card."
-                return Action("play", i, None)
-        # If there are no hints left, discard whatever you have the least info about. I could optimize this to discard less valuable cards, but I won't.
-        if state.hints == 0:
-            print "No hints, discarding."
-            # Look through cards, discard something with no info.
-            for i in range(state.hands[self.number].size):
-                if state.hands[self.number].info[i][0] == -1 and state.hands[self.number].info[i][1] == -1:
-                    return Action("discard", i, None)
-            # So everything has info, so let's discard something with only one piece of info.
-            for i in range(state.hands[self.number].size):
-                if state.hands[self.number].info[i][0] == -1 or state.hands[self.number].info[i][1] == -1:
-                    return Action("discard", i, None)
-            # Whatever, let's just discard something.
-            return Action("discard", 0, None)
-        #print "Nothing playable."
-        # If someone has something playable, hint that.
-        for i in range(len(state.players)):
-            if i == self.number:
-                continue
-            for j in range(state.hands[i].size):
-                #print "size: " + str(len(state.hands[i].cards)) + "; " + str(j)
-                if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
-                    if state.hands[i].info[j][0] == -1:
-                        print "Hinting color: " + str(j) + " of P" + str(i + 1)
-                        return Action("color", j, i)
-                    if state.hands[i].info[j][1] == -1:
-                        print "Hinting number: " + str(j) + " of P" + str(i + 1)
-                        return Action("number", j, i)
-        print "Nothing hintable, discarding."
-        # Can't do anything immediately helpful, so let's just discard cards we don't have info about. If we already have max hints, whatever.
         return Action("discard", 0, None)
 
     def rearrange(self, state):  # state: same as in move()
@@ -263,4 +229,6 @@ class Player:
             return True
 
     def scan(self, state):
-        pass
+        if state.action.type == "color" or state.action.type == "number":
+            self.hintlist.append(state.action)
+

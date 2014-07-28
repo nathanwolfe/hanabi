@@ -20,6 +20,7 @@ def game_end(game):
     stacks_as_string = ", ".join(str(i) for i in game.states[len(game.states) - 1].stacks)
     f.write(stacks_as_string + "\n")
     print game.states[len(game.states) - 1].calc_score()
+    print "Hints:"
     f.write("Score: " + str(game.states[len(game.states) - 1].calc_score()))
 
     sys.exit()  # just exits the program.
@@ -95,7 +96,7 @@ def main():
         state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
         curturn += 1
         state.turns = curturn
-
+        
         # recreate g_state and add to list of states
         print state.stacks
         for p in state.players:
@@ -121,6 +122,8 @@ def main():
         if len(state.deck.cards) == 0:
             final_countdown -= 1
         if state.lives <= 0 or state.calc_score() == 25 or final_countdown == 0:
+            if state.lives <= 0:
+                print "btdubs you died"
             game_end(game)
 
 main()
