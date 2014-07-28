@@ -66,6 +66,7 @@ def main():
         # Censor information of player's own hand + the deck and then pass to the player for a move
         censored = copy.deepcopy(state)
         censored.hands[state.curplayer].cards = []
+        censored.players = []
         for i in xrange(len(censored.deck.cards)):
             censored.deck.cards[i] = Card(0, 0)
         curmove = state.players[state.curplayer].move(censored)
