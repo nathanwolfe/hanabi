@@ -113,7 +113,6 @@ class Player:
 
         # Otherwise, see if the AI can hint a color, the newest card of which is playable.
         curcolor = 0
-        colorlist = [[0 for i in range(5)] for j in range(nplayers)]
         while curcolor <= 4:
             for i in range(nplayers):
                 if i == self.number:
@@ -194,8 +193,6 @@ class Player:
             else:
                 rest.append(i)
         return move_left + rest + play + last
-                
-        return move_left + move_right
 
     def permute(self, state, cardlist, order):  # permutes cards, the hint list, and your known info
         cardlist = self.permute_list(cardlist)
