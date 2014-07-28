@@ -14,13 +14,11 @@ NUM_PLAYERS = 2
 
 def game_end(game):
     # add more stuff later, this is a end game clean up function.
-
-    # This is currently set to APPEND!
-    f = open("game_results.txt", "a")
+    f = open("game_results.txt", "w")
     print "Game Over: Results"
     print game.states[len(game.states) - 1].stacks
     stacks_as_string = ", ".join(str(i) for i in game.states[len(game.states) - 1].stacks)
-    # f.write(stacks_as_string + "\n")
+    f.write(stacks_as_string + "\n")
     print game.states[len(game.states) - 1].calc_score()
     f.write("Score: " + str(game.states[len(game.states) - 1].calc_score()))
 
@@ -65,13 +63,12 @@ def main():
         # at end of states list of game, let players rearrange hand, let players look around.
         state = game.states[curturn]
         print "----------P" + str(state.curplayer + 1) + "-----------"
-        print "Oldest Card: " + state.players[state.curplayer].oldest_card(state).to_string()
         # Censor information of player's own hand + the deck and then pass to the player for a move
         censored = copy.deepcopy(state)
         censored.hands[state.curplayer].cards = []
         for i in xrange(len(censored.deck.cards)):
             censored.deck.cards[i] = Card(0, 0, censored.deck.cards[i].turn_drawn)
-        curmove = state.players[state.curplayer].move(censored)
+        curmove = state.players[state.curplayer].move(censored, NUM_PLAYERS)
         if curmove.type == "play":
             if not state.hands[state.curplayer].play(state, curmove.cards):
                 state.lives -= 1
@@ -121,9 +118,4 @@ def main():
             final_countdown -= 1
         if state.lives <= 0 or state.calc_score() == 25 or final_countdown == 0:
             game_end(game)
-
-for i in range(100):
-    main()
-
-g = open("game_results.txt", "r")
-
+main()

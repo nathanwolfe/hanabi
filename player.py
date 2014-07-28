@@ -10,33 +10,44 @@ This is an example player file. AI developers should be able to specify their ow
 class Player:
     def __init__(self, n):  # n = player number
         self.number = n
+        self.hintlist = []  # we need a list of hints because the info list doesn't provide any information about how recent that info was obtained. Hintlist is a list of duples [p, a] where p is the index of the player giving the hint and a is an action.
 
     def move(self, state, nplayers):
-        nextplayer = (state.curplayer + 1) % nplayers
-        self.rearrange(state)
-        if state.hints > 0 and state.players[nextplayer].is_last(state, 0):
-            print "Critical hint given"
-            return Action("number", 0, nextplayer)
+        #knownlist = []
+        #for i in range(state.hands[self.number].size):
+            #if state.hands[self.number].info[i][0] != -1 or state.hands[self.number].info[i][1] != -1:
+                #knownlist.append[i]
+        
+        #nextplayer = (state.curplayer + 1) % nplayers
+        #if state.hints > 0 and state.players[nextplayer].is_last(state, 0):
+            #print "Critical hint given"
+            #a = Action("number", 0, nextplayer)
+            #state.players[nextplayer].hintlist.append([self.number, a])
+            #return a
         # Same as before, play a card if you know what it is.
         for i in range(state.hands[self.number].size):
             if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
                 print "Played a card."
+                self.permutehints(state, )
+                return Action("play", i, None)
+            if state.hands[self.number].info[i][1] != -1:
+            #for j in range(len(state.stacks)):
+            #for j in range(5):
+             #   if self.playable(j, state.hands[self.number].info[i][1], state.stacks):  # state.stacks[j] == state.hands[self.number].info[i][1]:
+                print "Played a card, only knew number."
                 return Action("play", i, None)
         # Extended play: basically, checks the number of cards that are the same color; if two or more cards are the same color, the AI will play the newest card with that color. curcolor = number referring to current color; colnumbers = list of curcolor values for each color
         curcolor = 0
         colnumbers = [0, 0, 0, 0, 0]
         while curcolor <= 4:
-            for j in range(len(state.hands[self.number].info)):
+            for j in range(len(state.hands[self.number].cards)):
+                colcards = []
                 if state.hands[self.number].info[j][0] == curcolor:
                     colnumbers[curcolor] += 1
-            # optimization idea: make AI think through all possibilities before deciding what to play
+                    colcards.append(state.hands[self.number].cards[j])
             if colnumbers[curcolor] >= 2:
-                colcards = []
-                for k in range(len(state.hands[self.number].size)):
-                    c = state.hands[self.number].cards[k]
-                    if c.color == curcolor:
-                        colcards.append(c)
                 return Action("play", self.newest_card(colcards), None)
+            # optimization idea: make AI think through all possibilities before deciding what to play
             curcolor += 1
         # If there are no hints left, and no playable cards, discard the oldest with no knowledge.
         if state.hints == 0:
@@ -44,6 +55,82 @@ class Player:
             # rearrange() should place the card we want to discard in the 0 position
             return Action("discard", 0, None)
         # If we can/want to give a hint, this is where that happens
+        # The list of badcards [color, number] ensures that no player will accidentally play a card someone else is already going to play
+        badcards = []
+        for i in range(nplayers):
+            if i == self.number:
+                continue
+            for j in range(len(state.hands[i].info)):
+                for k in state.stacks:
+                    if state.hands[i].info[j][1] == k:
+                        badcards.append([state.hands[i].cards[j].color, state.hands[i].cards[j].number])
+
+        # First, see if the AI can hint a number, all cards of that number being playable.
+        curnumber = 0
+        sizelist = [[0 for i in range(5)] for j in range(nplayers)]
+
+        while curnumber <= 4:
+            for i in range(nplayers):
+                if i == self.number:
+                    continue
+                clist = []
+                for j in range(state.hands[i].size):
+                    if state.hands[i].cards[j].number == curnumber:
+                        c = state.hands[i].cards[j]
+                        if c not in badcards and self.playable(c.color, c.number, state.stacks) and [c.color, c.number] not in clist:
+                            sizelist[i][curnumber] += 1
+                            clist.append([c.color, c.number])
+                        else:
+                            sizelist[i][curnumber] = 0
+                            break
+            curnumber += 1
+
+        maxvalue = 0
+        maxindex = [0, 0]
+        for i in range(len(sizelist)):
+            for j in range(len(sizelist[i])):
+                if sizelist[i][j] > maxvalue:
+                    maxvalue = sizelist[i][j]
+                    maxindex = [i, j]
+
+        #maxvalues = map(max, sizelist)
+        #maxindices = [sizelist[i].index(max(sizelist[i])) for i in range(len(sizelist))]
+        #hintplayer = maxindices[maxvalues.index(max(maxvalues))]
+        #hintnumber = sizelist[hintplayer].index(max(sizelist[hintplayer]))
+        #print maxvalues
+
+        if sizelist[maxindex[0]][maxindex[1]] > 0:
+            a = Action("number", maxindex[1], maxindex[0])
+            state.players[maxindex[0]].hintlist.append([self.number, a])
+            print "hinting a number" + str(maxindex[1]) + ", all cards of which are playable"
+            return a
+
+        #if sizelist[hintplayer][hintnumber] > 0:
+        #    a = Action("number", hintnumber, hintplayer)
+        #    state.players[hintplayer].hintlist.append([self.number, a])
+        #    print "hinting a number, all cards of which are playable"
+        #    return a
+
+        # Otherwise, see if the AI can hint a color, the newest card of which is playable.
+        curcolor = 0
+        colorlist = [[0 for i in range(5)] for j in range(nplayers)]
+        while curcolor <= 4:
+            for i in range(nplayers):
+                if i == self.number:
+                    continue
+                for j in range(state.hands[i].size):
+                    c = state.hands[i].cards
+                    if state.hands[i].cards[j].color == curcolor and c[j] is self.newest_card(c) and c[j] not in badcards and self.playable(c[j].color, c[j].number, state.stacks):
+                        a = Action("color", j, i)
+                        state.players[i].hintlist.append([self.number, a])
+                        print "hinting color " + str(j) + "; newest card is playable"
+                        return a
+            curcolor += 1
+
+        # If there is nothing else to do, discard the oldest card.
+        print "Nothing else to do; discarding"
+        return Action("discard", 0, None)
+
         # Analyze state, hands, and the piles to determine which cards are of most importance
         # Next, run that card through various algorithms to see if which will clue the desire to play that card best
         goodPlays = []
@@ -114,6 +201,26 @@ class Player:
                 move_left.append(i)
         return move_left + move_right
 
+    def permutelist(self, l, order):  # permutes a list l into given order
+        newlist = []
+        for i in range(len(l)):
+            newlist.append(l[order[i]])
+        return newlist
+
+    def permute(self, state, cardlist, order):  # permutes cards, the hint list, and your known info
+        cardlist = self.permutelist(cardlist)
+        for i in range(len(self.hintlist)):
+            self.hintlist[i][1].cards = self.permutelist(i.cards)
+        for i in range(state.hands[self.number].size):
+            state.hands[self.number].info = self.permutelist[state.hands[self.number].info]
+
+    def permutehints(self, state, order):  # permutes hints!
+        for i in range(state.hands[self.number].size):
+            state.hands[self.number].info = self.permutelist[state.hands[self.number].info]
+
+    def popreplace(self, l, i, r): # l is a list, i the index, r the replacement
+        newlist = l.remove(i)
+
     def find_playable(self, state):
         playable_cards = []
         # h is a number, c is a number
@@ -172,3 +279,6 @@ class Player:
         elif counter == 2:
             assert card_num == 1
             return True
+
+    def scan(self, state):
+        pass

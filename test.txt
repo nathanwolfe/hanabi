@@ -1,0 +1,88 @@
+----------P1-----------
+b 5
+y 5
+b 4
+b 2
+w 2
+----------P2-----------
+b 1
+r 3
+w 4
+y 1
+r 4
+----------P1-----------
+hinting a number0, all cards of which are playable
+b 5
+y 5
+b 4
+b 2
+w 2
+----------P2-----------
+Played a card, only knew number.
+r 3
+w 4
+y 1
+r 4
+r 1
+----------P1-----------
+hinting a number0, all cards of which are playable
+b 5
+y 5
+b 4
+b 2
+w 2
+----------P2-----------
+Played a card, only knew number.
+You lost a life
+w 4
+y 1
+r 4
+r 1
+y 3
+----------P1-----------
+hinting a number0, all cards of which are playable
+b 5
+y 5
+b 4
+b 2
+w 2
+----------P2-----------
+Played a card, only knew number.
+You lost a life
+y 1
+r 4
+r 1
+y 3
+g 1
+----------P1-----------
+hinting a number0, all cards of which are playable
+b 5
+y 5
+b 4
+b 2
+w 2
+----------P2-----------
+Played a card, only knew number.
+r 4
+r 1
+y 3
+g 1
+g 1
+----------P1-----------
+hinting color 4; newest card is playable
+b 5
+y 5
+b 4
+b 2
+w 2
+----------P2-----------
+Played a card, only knew number.
+You lost a life
+r 1
+y 3
+g 1
+g 1
+g 3
+Game Over: Results
+[0, 1, 0, 1, 0]
+2
