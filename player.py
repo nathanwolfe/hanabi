@@ -28,13 +28,13 @@ class Player:
         for i in range(state.hands[self.number].size):
             if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
                 print "Played a card."
-                self.permute_hints(state, )
                 return Action("play", i, None)
             if state.hands[self.number].info[i][1] != -1:
             #for j in range(len(state.stacks)):
             #for j in range(5):
              #   if self.playable(j, state.hands[self.number].info[i][1], state.stacks):  # state.stacks[j] == state.hands[self.number].info[i][1]:
                 print "Played a card, only knew number."
+                print str(state.hands[self.number].info)
                 return Action("play", i, None)
         # Extended play: basically, checks the number of cards that are the same color; if two or more cards are the same color, the AI will play the newest card with that color. curcolor = number referring to current color; colnumbers = list of curcolor values for each color
         curcolor = 0
@@ -93,6 +93,12 @@ class Player:
                     maxvalue = sizelist[i][j]
                     maxindex = [i, j]
 
+        cardindex = -1
+        for i in range(len(state.hands[maxindex[0]].cards)):
+            if state.hands[maxindex[0]].cards[i].number == maxindex[1]:
+                cardindex = i
+                break
+            
         #maxvalues = map(max, sizelist)
         #maxindices = [sizelist[i].index(max(sizelist[i])) for i in range(len(sizelist))]
         #hintplayer = maxindices[maxvalues.index(max(maxvalues))]
@@ -100,7 +106,7 @@ class Player:
         #print maxvalues
 
         if sizelist[maxindex[0]][maxindex[1]] > 0:
-            a = Action("number", maxindex[1], maxindex[0])
+            a = Action("number", cardindex, maxindex[0])
             state.players[maxindex[0]].hintlist.append([self.number, a])
             print "hinting a number" + str(maxindex[1]) + ", all cards of which are playable"
             return a
@@ -193,13 +199,6 @@ class Player:
             else:
                 rest.append(i)
         return move_left + rest + play + last
-
-    def permute(self, state, cardlist, order):  # permutes cards, the hint list, and your known info
-        cardlist = self.permute_list(cardlist)
-        for i in range(len(self.hintlist)):
-            self.hintlist[i][1].cards = self.permute_list(i.cards)
-        for i in range(state.hands[self.number].size):
-            state.hands[self.number].info = self.permute_list[state.hands[self.number].info]
 
     def find_playable(self, state):
         playable_cards = []
