@@ -25,7 +25,7 @@ class Hand:
 
     def is_valid(self, c, state):
         # c is the card index that is being tested against cs, the currently played cards.
-        if state.stacks[self.cards[c].color] is self.cards[c].number:
+        if state.stacks[self.cards[c].color] == self.cards[c].number:
             return True
         return False
 

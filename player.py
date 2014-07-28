@@ -23,7 +23,7 @@ class Player:
             #print "Critical hint given"
             #a = Action("number", 0, nextplayer)
             #state.players[nextplayer].hintlist.append([self.number, a])
-            #return a
+            #returna
         # Same as before, play a card if you know what it is.
         for i in range(state.hands[self.number].size):
             if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
@@ -40,13 +40,17 @@ class Player:
         curcolor = 0
         colnumbers = [0, 0, 0, 0, 0]
         while curcolor <= 4:
-            for j in range(len(state.hands[self.number].cards)):
-                colcards = []
+            colcards = []
+            for j in range(state.hands[self.number].size):
                 if state.hands[self.number].info[j][0] == curcolor:
                     colnumbers[curcolor] += 1
                     colcards.append(state.hands[self.number].cards[j])
-            if colnumbers[curcolor] >= 2:
-                return Action("play", self.newest_card(colcards), None)
+            if colnumbers[curcolor] >= 1:
+                print "played newest card of color " + str(curcolor)
+                print state.hands[self.number].info
+                return Action(
+                    "play", state.hands[self.number].cards.index(self.newest_card(colcards)), None
+                )
             # optimization idea: make AI think through all possibilities before deciding what to play
             curcolor += 1
         # If there are no hints left, and no playable cards, discard the oldest with no knowledge.
@@ -64,7 +68,7 @@ class Player:
                 for k in state.stacks:
                     if state.hands[i].info[j][1] == k:
                         badcards.append([state.hands[i].cards[j].color, state.hands[i].cards[j].number])
-
+                    
         # First, see if the AI can hint a number, all cards of that number being playable.
         curnumber = 0
         sizelist = [[0 for i in range(5)] for j in range(nplayers)]
@@ -77,7 +81,7 @@ class Player:
                 for j in range(state.hands[i].size):
                     if state.hands[i].cards[j].number == curnumber:
                         c = state.hands[i].cards[j]
-                        if c not in badcards and self.playable(c.color, c.number, state.stacks) and [c.color, c.number] not in clist:
+                        if [c.color, c.number] not in badcards and self.playable(c.color, c.number, state.stacks) and [c.color, c.number] not in clist:
                             sizelist[i][curnumber] += 1
                             clist.append([c.color, c.number])
                         else:
@@ -120,15 +124,19 @@ class Player:
         # Otherwise, see if the AI can hint a color, the newest card of which is playable.
         curcolor = 0
         while curcolor <= 4:
+            colcards = []
             for i in range(nplayers):
                 if i == self.number:
                     continue
+                c = state.hands[i].cards
                 for j in range(state.hands[i].size):
-                    c = state.hands[i].cards
-                    if state.hands[i].cards[j].color == curcolor and c[j] is self.newest_card(c) and c[j] not in badcards and self.playable(c[j].color, c[j].number, state.stacks):
+                    if c[j].color == curcolor:
+                        colcards.append(c[j])
+                for j in range(state.hands[i].size):
+                    if len(colcards) > 0 and c[j] is self.newest_card(colcards) and [c[j].color, c[j].number] not in badcards and self.playable(c[j].color, c[j].number, state.stacks):
                         a = Action("color", j, i)
                         state.players[i].hintlist.append([self.number, a])
-                        print "hinting color " + str(j) + "; newest card is playable"
+                        print "hinting color " + str(curcolor) + "; newest card is playable"
                         return a
             curcolor += 1
 
@@ -180,25 +188,20 @@ class Player:
     def rearrange(self, state):  # state: same as in move()
         # Rearrange your hand if you want to
         # takes the hand into two parts - moves older cards to the left (nearer to discard) and known cards to the right (or 5's)
-        move_right = []
-        move_left = []
-        for i in range(state.hands[self.number].size):
-            if (not state.hands[self.number].info[i][0] == -1 and not state.hands[self.number].info[i][1] == -1) or self.is_last(state, i):
-                move_right.append(i)
-            else:
-                move_left.append(i)
-        # now split up these cards into order of preference
         last = []
         play = []
-        rest = []
-        for i in range(len(move_right)):
+        known = []
+        other = []
+        for i in range(state.hands[self.number].size):
             if self.is_last(state, i):
                 last.append(i)
             elif self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
                 play.append(i)
+            elif (not state.hands[self.number].info[i][0] == -1) or (not state.hands[self.number].info[i][1]):
+                known.append(i)
             else:
-                rest.append(i)
-        return move_left + rest + play + last
+                other.append(i)
+        return other + known + play + last
 
     def find_playable(self, state):
         playable_cards = []
@@ -256,7 +259,7 @@ class Player:
             elif card_num == 0:
                 return True
         elif counter == 2:
-            assert card_num == 1
+            assert card_num == 0
             return True
 
     def scan(self, state):
