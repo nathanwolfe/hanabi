@@ -28,7 +28,7 @@ class Player:
         for i in range(state.hands[self.number].size):
             if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
                 print "Played a card."
-                self.permutehints(state, )
+                self.permute_hints(state, )
                 return Action("play", i, None)
             if state.hands[self.number].info[i][1] != -1:
             #for j in range(len(state.stacks)):
@@ -131,23 +131,6 @@ class Player:
         print "Nothing else to do; discarding"
         return Action("discard", 0, None)
 
-        # Analyze state, hands, and the piles to determine which cards are of most importance
-        # Next, run that card through various algorithms to see if which will clue the desire to play that card best
-        goodPlays = []
-        possDiscs = []
-        for i in range(len(state.players)):
-            if i == self.number:
-                continue
-            for j in range(state.hands[i].size):
-                if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
-                    goodPlays.append([i, j])
-                elif state.stacks[state.hands[i].cards[j].color] > state.hands[i].cards[j].number:
-                    # This is true if the card in question has already been played.  Then it may be clued for discard
-                    possDiscs.append([i, j])
-        # what does this do...?
-        for x in goodPlays:
-            pass
-
     def move_old(self, state):  # state = current state of the game which is has player's own hand as empty list and deck as list of dummy cards (red 1s)
         # temporary example function
         # for i in range(len(self.cards)):
@@ -188,7 +171,7 @@ class Player:
         print "Nothing hintable, discarding."
         # Can't do anything immediately helpful, so let's just discard cards we don't have info about. If we already have max hints, whatever.
         return Action("discard", 0, None)
-    
+
     def rearrange(self, state):  # state: same as in move()
         # Rearrange your hand if you want to
         # takes the hand into two parts - moves older cards to the left (nearer to discard) and known cards to the right (or 5's)
@@ -199,27 +182,27 @@ class Player:
                 move_right.append(i)
             else:
                 move_left.append(i)
+        # now split up these cards into order of preference
+        last = []
+        play = []
+        rest = []
+        for i in range(len(move_right)):
+            if self.is_last(state, i):
+                last.append(i)
+            elif self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
+                play.append(i)
+            else:
+                rest.append(i)
+        return move_left + rest + play + last
+                
         return move_left + move_right
 
-    def permutelist(self, l, order):  # permutes a list l into given order
-        newlist = []
-        for i in range(len(l)):
-            newlist.append(l[order[i]])
-        return newlist
-
     def permute(self, state, cardlist, order):  # permutes cards, the hint list, and your known info
-        cardlist = self.permutelist(cardlist)
+        cardlist = self.permute_list(cardlist)
         for i in range(len(self.hintlist)):
-            self.hintlist[i][1].cards = self.permutelist(i.cards)
+            self.hintlist[i][1].cards = self.permute_list(i.cards)
         for i in range(state.hands[self.number].size):
-            state.hands[self.number].info = self.permutelist[state.hands[self.number].info]
-
-    def permutehints(self, state, order):  # permutes hints!
-        for i in range(state.hands[self.number].size):
-            state.hands[self.number].info = self.permutelist[state.hands[self.number].info]
-
-    def popreplace(self, l, i, r): # l is a list, i the index, r the replacement
-        newlist = l.remove(i)
+            state.hands[self.number].info = self.permute_list[state.hands[self.number].info]
 
     def find_playable(self, state):
         playable_cards = []
