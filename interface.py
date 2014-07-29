@@ -34,6 +34,7 @@ def setup():
     card_stacks = [0 for i in range(5)]
 
     phands = [[deck.pop_card() for i in range(HAND_SIZE)] for j in range(NUM_PLAYERS)]  # initialize hands
+
     hands = []
     for i in phands:
         hands.append(Hand(i, HAND_SIZE))
@@ -93,10 +94,11 @@ def main():
         # debug
         for k in state.hands[state.curplayer].cards:
             print k.to_string()
+
         state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
         curturn += 1
         state.turns = curturn
-        
+
         # recreate g_state and add to list of states
         print state.stacks
         for p in state.players:
