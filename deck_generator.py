@@ -8,9 +8,9 @@ import random
 Creating a full_list of cards
 """
 
-list_1 = [Card(i % 5, i / 5, None, None) for i in range(0, 25)]  # one copy of each card
-list_2 = [Card(i % 5, i / 5, None, None) for i in range(0, 20)]
-list_3 = [Card(j, 0, None, None) for j in range(0, 5)]
+list_1 = [Card(i % 5, i / 5, None) for i in range(0, 25)]  # one copy of each card
+list_2 = [Card(i % 5, i / 5, None) for i in range(0, 20)]
+list_3 = [Card(j, 0, None) for j in range(0, 5)]
 full_list = list_1 + list_2 + list_3
 
 

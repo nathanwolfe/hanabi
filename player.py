@@ -10,8 +10,8 @@ This is an example player file. AI developers should be able to specify their ow
 class Player:
     def __init__(self, n):  # n = player number
         self.number = n
-        self.play_queue = None  # list of cards to be played
-        self.all_queues = None
+        self.play_queue = []  # list of cards to be played
+        self.all_queues = []
 
     def move(self, state, nplayers):
         # assume we've figured out all of our variables and rearranged all of our cards.
@@ -20,7 +20,8 @@ class Player:
         critical discard of next person
         there are playable cards in queue
         critical discard of person later one
-        give hints to players
+        
+give hints to players
         if nothing else can be done, discard
         """
 
@@ -52,6 +53,7 @@ class Player:
                     if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
                         ph_sublist.append(state.hands[i].cards[j].ID)
             possible_hints.append(ph_sublist)
+            possible_hints.append(state.hands[i].cards[j].ID)
         return self.select_hint(state, possible_hints, self.all_queues)
 
         # Case: if nothing else can be done, discard
@@ -135,10 +137,24 @@ class Player:
                 return i
         return -1
 
-    def imaginary_stack(self, state, all_queues, nplayers):
-        # returns an imaginary stack based on what people know and are going to play. Method: generates lists that are concatenations of range(state.stacks[i]) and numbers in all_queues and finds the longest length of consecutive numbers in each list. Useless for now
-        imaginary_played = [set(xrange(state.stacks[i])) for i in xrange(len(state.stacks))]
-        for i in xrange(nplayers):
+    def imaginary_stacks(self, state, all_queues, nplayers):
+        # returns an imaginary stack based on what people know and are going to play. Plays must be in numerical order (ie R1 R2 R3), otherwise bad things will happen.
+        ext_stacks = state.stacks
+        for i in xrange(len(state.stacks)):
+            current_stack = state.stacks[i]
+            p = (self.number + 1) % nplayers
+            while p != self.number:
+                index = self.index_from_ID(state, self.all_queues[p][0])
+                if index == -1:
+                    continue
+                if state.hands[p].cards[index].number == current_stack:
+                    current_stack += 1
+                    ext_stacks[i] += 1
+                p = (p + 1) % nplayers
+            return ext_stacks
+
+        '''imaginary_played = [set(range(state.stacks[i])) for i in range(len(state.stacks))]
+        for i in range(nplayers):
             if i == self.number:
                 continue
             for id in self.all_queues[i]:
@@ -152,9 +168,26 @@ class Player:
             while n in imaginary_played[i]:
                 n += 1
             maxlengths[i] = n - 1
-        return maxlengths
-        
+        return maxlengths'''
+
     def select_hint(self, state, possible_hints, all_queues):
+        # primitive version prioritizes players nearest to current player in playing order above all else.
+        p = (self.number + 1) % len(state.players)
+        while p != self.number:
+            for hint in possible_hints[p]:
+                hinted_cards = [[]]
+                for card in state.hands[p].cards:
+                    pass
+                
+            p = (p + 1) % len(state.players)
+        
+    def can_hint(self, state, hint, c_or_n, all_queues):
+        pass
+
+    def select_color(self, possible_hints, all_queues):
+        pass
+
+    def select_number(self, possible_hints, all_queues):
         pass
         # todo: write function that optimizes the hints given to someone. Returns a hint action.
 
