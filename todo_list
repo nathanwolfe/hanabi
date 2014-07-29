@@ -1,4 +1,5 @@
-TODO: 
-Fix bug with multiple color hinting
-Make order in which you examine hands more optimal
-
+If a multiple _color_ hint includes the potential discard, do not take as a normal hint
+To prevent a critical discard, if can hint only one attribute do that
+card counting
+If a multi number hint reveals all info about at least one card, do not add the rest to the play queue
+multi color will first add fully known, if none then add newest

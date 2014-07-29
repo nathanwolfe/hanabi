@@ -68,9 +68,9 @@ def main():
         # Censor information of player's own hand + the deck and then pass to the player for a move
         censored = copy.deepcopy(state)
         for i in xrange(len(censored.hands[state.curplayer].cards)):
-            censored.hands[state.curplayer].cards[i] = Card(0, 0, state.hands[state.curplayer].cards[i].turn_drawn)
+            censored.hands[state.curplayer].cards[i] = Card(0, 0, state.hands[state.curplayer].cards[i].ID)
         for i in xrange(len(censored.deck.cards)):
-            censored.deck.cards[i] = Card(0, 0, censored.deck.cards[i].turn_drawn)
+            censored.deck.cards[i] = Card(0, 0, censored.deck.cards[i].ID)
         curmove = state.players[state.curplayer].move(censored, NUM_PLAYERS)
         if curmove.type == "play":
             if not state.hands[state.curplayer].play(state, curmove.cards):
@@ -102,23 +102,23 @@ def main():
         # recreate g_state and add to list of states
         print state.stacks
         for p in state.players:
-            # censor each player's hands + the deck, then pass state for rearrangement
-            visible = copy.deepcopy(state)
-            for i in xrange(len(visible.hands[p.number].cards)):
-                visible.hands[p.number].cards[i] = Card(0, 0, visible.hands[p.number].cards[i].turn_drawn)
-            for i in xrange(len(visible.deck.cards)):
-                visible.deck.cards[i] = Card(0, 0, visible.deck.cards[i].turn_drawn)
-            permutation = p.rearrange(visible)
-            state.hands[p.number].rearrange(permutation)
-
-        for p in state.players:
             # censor hands + the deck then pass for lookaround
             visible = copy.deepcopy(state)
             for i in xrange(len(visible.hands[p.number].cards)):
-                visible.hands[p.number].cards[i] = Card(0, 0, visible.hands[p.number].cards[i].turn_drawn)
+                visible.hands[p.number].cards[i] = Card(0, 0, visible.hands[p.number].cards[i].ID)
             for i in xrange(len(visible.deck.cards)):
-                visible.deck.cards[i] = Card(0, 0, visible.deck.cards[i].turn_drawn)
-            p.scan(visible)
+                visible.deck.cards[i] = Card(0, 0, visible.deck.cards[i].turn_drawn, visible.deck.cards[i].ID)
+            p.analyze(visible)
+
+        for p in state.players:
+            # censor each player's hands + the deck, then pass state for rearrangement
+            visible = copy.deepcopy(state)
+            for i in xrange(len(visible.hands[p.number].cards)):
+                visible.hands[p.number].cards[i] = Card(0, 0, visible.hands[p.number].cards[i].ID)
+            for i in xrange(len(visible.deck.cards)):
+                visible.deck.cards[i] = Card(0, 0, visible.deck.cards[i].ID)
+            permutation = p.rearrange(visible)
+            state.hands[p.number].rearrange(permutation)
 
         game.states.append(state)
         if len(state.deck.cards) == 0:

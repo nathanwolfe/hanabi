@@ -1,14 +1,15 @@
 class Card:
 
-    def __init__(self, c, n, t):
+    def __init__(self, c, n, t, i):
         # number and color should both be ints
         # number and color both range 0 through 4
+        # i is an int indicating id
         """
         Color: Red Yellow Green Blue White -> 0 1 2 3 4
         """
         self.number = n
         self.color = c
-        self.turn_drawn = t  # the turn on which this card was drawn
+        self.ID = i
 
     def to_string(self):
         # with the color first because that's how you say it

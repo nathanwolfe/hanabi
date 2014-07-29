@@ -10,10 +10,18 @@ This is an example player file. AI developers should be able to specify their ow
 class Player:
     def __init__(self, n):  # n = player number
         self.number = n
-        self.hintlist = []  # we need a list of hints because the info list doesn't provide any information about how recent that info was obtained. Hintlist is a list of duples [p, a] where p is the index of the player giving the hint and a is an action.
+        self.play_queue = None  # list of cards to be played
+        self.other_queues = None
 
     def move(self, state, nplayers):
+        # assume we've figured out all of our variables and rearranged all of our cards
         return Action("discard", 0, None)
+
+    def analyze(self, state):
+        for i in range(len(state.hands[self.number].cards)):
+            i_duple = state.hands[self.number].info[i]
+            if self.playable(i_duple[0], i_duple[1], state.stacks):
+                self.play_queue.append(state.hands[self.number].cards[i].ID)
 
     def rearrange(self, state):  # state: same as in move()
         # Rearrange your hand if you want to
@@ -33,17 +41,6 @@ class Player:
                 other.append(i)
         return other + known + play + last
 
-    def find_playable(self, state):
-        playable_cards = []
-        # h is a number, c is a number
-        for h in range(len(state.hands)):
-            if h == self.number:
-                continue
-            for c in range(state.hands[h].size):
-                if self.playable(state.hands[h].cards[c].color, state.hands[h].cards[c].number, state.stacks):
-                    playable_cards.append([h, c])
-        return playable_cards
-
     def playable(self, color, number, stacks):
         # Is the card guaranteed playable on stacks (list)?
         # color and number should be -1 if unknown
@@ -56,10 +53,10 @@ class Player:
             return False
 
     def newest_card(self, cards):
-        return max(cards, key=attrgetter("turn_drawn"))
+        return max(cards, key=attrgetter("ID"))
 
     def oldest_card(self, cards):
-        return min(cards, key=attrgetter("turn_drawn"))
+        return min(cards, key=attrgetter("ID"))
 
     def is_last(self, state, card_color, card_num, n):
         # function determines whether a card is the last of its kind
@@ -90,7 +87,9 @@ class Player:
             assert card_num == 0
             return True
 
-    def scan(self, state):
-        if state.action.type == "color" or state.action.type == "number":
-            self.hintlist.append(state.action)
-
+    def index_from_ID(self, state, ID):
+        # returns an index based on an ID of a card in your hand
+        for i in xrange(len(state.hands[self.number].cards)):
+            if state.hands[self.number].cards[i].ID == ID:
+                return i
+        return -1

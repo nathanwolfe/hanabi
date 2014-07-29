@@ -10,10 +10,10 @@ class State:
         self.players = p  # players
         self.curplayer = cp  # whoever's turn it is
         self.turns = t  # how many turns have passed?
-        self.action = None
+        self.action_list = []  # list of all past actions
 
     def attach_action(self, a):  # Attaches an action to this state. For interface use only.
-        self.action = a
+        self.action_list.append(a)
 
     def calc_score(self):
         result = 0
