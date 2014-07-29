@@ -5,4 +5,4 @@ If a multi number hint reveals all info about at least one card, do not add the 
 multi color will first add fully known, if none then add newest
 
 Analyze: shift play_queue order based on clues given to others later
-TODO:
+TODO: 

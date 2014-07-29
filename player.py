@@ -44,12 +44,14 @@ class Player:
         # Case: give hints to players
         possible_hints = []  # LIST OF IDS OF CARDS THAT CAN BE HINTED
         for i in xrange(nplayers):
+            ph_sublist = []  # possible hints for each
             if i == self.number:
                 continue
             else:
                 for j in xrange(len(state.hands[i].cards)):
                     if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
-                        possible_hints.append(state.hands[i].cards[j].ID)
+                        ph_sublist.append(state.hands[i].cards[j].ID)
+            possible_hints.append(ph_sublist)
         return self.select_hint(state, possible_hints, self.all_queues)
 
         # Case: if nothing else can be done, discard
@@ -169,4 +171,26 @@ class Player:
         color = state.hands[player].cards[0].color
         number = state.hands[player].cards[0].number
         
-        if 
+        if self.attribute_list(state.hands[player].cards, "color", color) == 1:
+            return Action("color", 0, player)
+        elif self.attribute_list(state.hands[player].cards, "number", number) == 1:
+            return Action("number", 0, player)
+        else:
+            return Action("color", 0, player)
+
+    def attribute_list(self, clist, c_or_n, attr):
+        # clist is a list of cards
+        # returns a list of IDs of cards satsfying the attribute
+        # DO NOT CALL ON YOURSELF
+        out = []
+        if c_or_n == "color":
+            for i in range(clist):
+                if clist.color == attr:
+                    out.append(clist[i].ID)
+        elif c_or_n == "number":
+            for i in range(clist):
+                if clist.number == attr:
+                    out.append(clist[i].ID)
+        return out
+
+    
