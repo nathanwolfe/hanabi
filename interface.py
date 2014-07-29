@@ -104,16 +104,16 @@ def main():
             visible.hands[p.number].cards = []
             for i in xrange(len(visible.deck.cards)):
                 visible.deck.cards[i] = Card(0, 0)
-                permutation = p.rearrange(visible)
-                state.hands[p.number].rearrange(permutation)
+            permutation = p.rearrange(visible)
+            state.hands[p.number].rearrange(permutation)
 
-            for p in state.players:
+        for p in state.players:
                 # censor handss + the deck then pass for lookaround
-                visible = copy.deepcopy(state)
-                visible.hands[p.number].cards = []
-                for i in xrange(len(visible.deck.cards)):
-                    visible.deck.cards[i] = Card(0, 0)
-                p.scan(visible)
+            visible = copy.deepcopy(state)
+            visible.hands[p.number].cards = []
+            for i in xrange(len(visible.deck.cards)):
+                visible.deck.cards[i] = Card(0, 0)
+            p.scan(visible)
         if len(state.deck.cards) == 0:
             final_countdown -= 1
         if state.lives <= 0 or state.calc_score() == 25 or final_countdown == 0:
