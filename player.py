@@ -13,6 +13,13 @@ class Player:
         self.hintlist = []  # we need a list of hints because the info list doesn't provide any information about how recent that info was obtained. Hintlist is a list of duples [p, a] where p is the index of the player giving the hint and a is an action.
 
     def move(self, state, nplayers):
+        
+        # If we see critical problemos, hint
+        for i in range(nplayers):
+            if self.is_last(state, state.hands[i].cards[0].color, state.hands[i].cards[0].number, 0):
+                # this also needs to be optimized: pick one of the two to hint (here I just went with number)
+                return Action("number", 0, i)
+
         # Same as before, play a card if you know what it is.
         for i in range(state.hands[self.number].size):
             if self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
@@ -159,7 +166,7 @@ class Player:
         known = []
         other = []
         for i in range(state.hands[self.number].size):
-            if self.is_last(state, i):
+            if self.is_last(state, state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], i):
                 last.append(i)
             elif self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
                 play.append(i)
@@ -197,11 +204,9 @@ class Player:
     def oldest_card(self, cards):
         return min(cards, key=attrgetter("turn_drawn"))
 
-    def is_last(self, state, n):
+    def is_last(self, state, card_color, card_num, n):
         # function determines whether a card is the last of its kind
         # NOTE: If the card is a red 1, and a red 1 has been successfully played in the past, this will still return FALSE even if this is the last red 1
-        card_color = state.hands[self.number].info[n][0]
-        card_num = state.hands[self.number].info[n][1]
         counter = 0
 
         if card_color == -1 or card_num == -1:
