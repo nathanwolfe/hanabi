@@ -1,6 +1,6 @@
 class Card:
 
-    def __init__(self, c, n, t, i):
+    def __init__(self, c, n, i):
         # number and color should both be ints
         # number and color both range 0 through 4
         # i is an int indicating id

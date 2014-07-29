@@ -170,3 +170,5 @@ class Player:
         number = state.hands[player].cards[0].number
         
         if 
+
+    
