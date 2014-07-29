@@ -93,3 +93,27 @@ class Player:
             if state.hands[self.number].cards[i].ID == ID:
                 return i
         return -1
+
+    def imaginary_stack(self, state, all_queues, nplayers):
+        # returns an imaginary stack based on what people know and are going to play. Method: generates lists that are concatenations of range(state.stacks[i]) and numbers in all_queues and finds the longest length of consecutive numbers in each list. Useless for now
+        imaginary_played = [set(range(state.stacks[i])) for i in range(len(state.stacks))]
+        for i in range(nplayers):
+            if i == self.number:
+                continue
+            for id in self.all_queues[i]:
+                if self.index_from_ID(state, id) == -1:
+                    continue
+                c = state.hands[i].cards[self.index_from_ID(state, id)]
+                imaginary_played[c.color] |= set([c.number])
+        maxlengths = None
+        for i in range(len(imaginary_played)):
+            n = 0  # iterator
+            while n in imaginary_played[i]:
+                n += 1
+            maxlengths[i] = n - 1
+        return maxlengths
+        
+    def select_hint(self, state, possible_hints, all_queues):
+        pass
+
+        # todo: write function that optimizes the hints given to someone. Returns a hint action.
