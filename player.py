@@ -52,7 +52,7 @@ class Player:
                     if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
                         ph_sublist.append(state.hands[i].cards[j].ID)
             possible_hints.append(ph_sublist)
-        return self.select_hint(state, possible_hints, self.all_queues)
+        # return self.select_hint(state, possible_hints, self.all_queues)
 
         # Case: if nothing else can be done, discard
         return Action("discard", 0, None)
@@ -192,5 +192,3 @@ class Player:
                 if clist.number == attr:
                     out.append(clist[i].ID)
         return out
-
-    
