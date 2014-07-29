@@ -15,6 +15,9 @@ class State:
         self.action = a
     
     def calc_score(self):
+        assert self.lives >= 0
+        if self.lives == 0:
+            return 0
         result = 0
         for i in range(len(self.stacks)):
             result += self.stacks[i]

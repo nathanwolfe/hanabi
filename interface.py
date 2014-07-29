@@ -108,7 +108,7 @@ def main():
             state.hands[p.number].rearrange(permutation)
 
         for p in state.players:
-                # censor handss + the deck then pass for lookaround
+            # censor hands + the deck then pass for lookaround
             visible = copy.deepcopy(state)
             visible.hands[p.number].cards = []
             for i in xrange(len(visible.deck.cards)):
