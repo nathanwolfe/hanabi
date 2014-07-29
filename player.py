@@ -11,10 +11,41 @@ class Player:
     def __init__(self, n):  # n = player number
         self.number = n
         self.play_queue = None  # list of cards to be played
-        self.other_queues = None
+        self.all_queues = None
 
     def move(self, state, nplayers):
-        # assume we've figured out all of our variables and rearranged all of our cards
+        # assume we've figured out all of our variables and rearranged all of our cards.
+        """
+        Order of Cases:
+        critical discard of next person
+        there are playable cards in queue
+        critical discard of person later one
+        if nothing else can be done, discard
+        """
+
+        # Case: critical discard of next person
+        next_discard = state.hands[(self.number + 1) % nplayers].cards[0]
+        if self.is_last(state, next_discard.color, next_discard.number):
+            return Action("hint", 0, (self.number + 1) % nplayers)
+
+        # Case: there are playable cards in queue
+        if len(self.play_queue) > 0:
+            return Action("play", self.index_from_ID(self.play_queue[0]), None)
+
+        # Case: critical discard of person later on
+        
+        # Case: give hints to players
+        possible_hints = []  # LIST OF IDS OF CARDS THAT CAN BE HINTED
+        for i in nplayers:
+            if i == self.number:
+                continue
+            else:
+                for j in xrange(len(state.hands[i].cards)):
+                    if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
+                        possible_hints.append(state.hands[i].cards[j].ID)
+        return self.select_hint(self, state, possible_hints, self.all_queues)
+
+        # Case: if nothing else can be done, discard
         return Action("discard", 0, None)
 
     def analyze(self, state):
@@ -31,7 +62,7 @@ class Player:
         known = []
         other = []
         for i in range(state.hands[self.number].size):
-            if self.is_last(state, state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], i):
+            if self.is_last(state, state.hands[self.number].info[i][0], state.hands[self.number].info[i][1]):
                 last.append(i)
             elif self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
                 play.append(i)
@@ -58,8 +89,9 @@ class Player:
     def oldest_card(self, cards):
         return min(cards, key=attrgetter("ID"))
 
-    def is_last(self, state, card_color, card_num, n):
+    def is_last(self, state, card_color, card_num):
         # function determines whether a card is the last of its kind
+        # n is the index of the card.
         # NOTE: If the card is a red 1, and a red 1 has been successfully played in the past, this will still return FALSE even if this is the last red 1
         counter = 0
 
