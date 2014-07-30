@@ -153,7 +153,7 @@ class Player:
                 n += 1
             maxlengths[i] = n - 1
         return maxlengths
-        
+
     def select_hint(self, state, possible_hints, all_queues):
         pass
         # todo: write function that optimizes the hints given to someone. Returns a hint action.
@@ -170,7 +170,6 @@ class Player:
         assert not player == self.number
         color = state.hands[player].cards[0].color
         number = state.hands[player].cards[0].number
-        
         if self.attribute_list(state.hands[player].cards, "color", color) == 1:
             return Action("color", 0, player)
         elif self.attribute_list(state.hands[player].cards, "number", number) == 1:
