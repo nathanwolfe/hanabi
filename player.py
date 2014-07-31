@@ -10,8 +10,8 @@ This is an example player file. AI developers should be able to specify their ow
 class Player:
     def __init__(self, n):  # n = player number
         self.number = n
-        self.play_queue = None  # list of cards to be played
-        self.all_queues = None
+        self.play_queue = []  # list of cards to be played
+        self.all_queues = []
 
     def move(self, state, nplayers):
         # assume we've figured out all of our variables and rearranged all of our cards.
@@ -23,14 +23,17 @@ class Player:
         give hints to players
         if nothing else can be done, discard
         """
+        next_p = (self.number + 1) % nplayers  # generally helpful index
 
         # Case: critical discard of next person
-        next_discard = state.hands[(self.number + 1) % nplayers].cards[0]
+        next_discard = state.hands[next_p].cards[0]
         if self.is_critical(state, next_discard.color, next_discard.number):
-            return Action("hint", 0, (self.number + 1) % nplayers)
+            print "Critical discard hint given."
+            return self.warn_critical(state, next_p)
 
         # Case: there are playable cards in queue
         if len(self.play_queue) > 0:
+            "Played first card in queue."
             return Action("play", self.index_from_ID(self.play_queue.pop(0)), None)
 
         # Case: critical discard of person 2 seats ahead
@@ -39,6 +42,7 @@ class Player:
             next_discard = state.hands[p].cards[0]
             if self.is_critical(state, next_discard.color, next_discard.number):
                 if state.hints <= 1:
+                    print "Critical discard hint given."
                     return self.warn_critical(state, p)
 
         # Case: give hints to players
@@ -52,9 +56,15 @@ class Player:
                     if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
                         ph_sublist.append(state.hands[i].cards[j].ID)
             possible_hints.append(ph_sublist)
-        self.select_hint(state, possible_hints, self.all_queues)
+        # assuming select_hint returns a triple [player, ID, hint type]
+        hint_triple = self.select_hint(state, possible_hints, self.all_queues)
+        if hint_triple[1] != -1:
+            # this print statement needs work...
+            print "Hinted to " + str(hint_triple[0]) + "the card at " + str(self.index_from_ID(hint_triple[1])) + "."
+            return Action(hint_triple[2], self.index_from_ID(hint_triple[1]), hint_triple[0])
 
         # Case: if nothing else can be done, discard
+        print "Discarding."
         return Action("discard", 0, None)
 
     def analyze(self, state):
@@ -183,13 +193,15 @@ class Player:
         # Temporary convention heavy version.
         p = (self.number + 1) % len(state.players)
         while p != self.number:
-            for hint in possible_hints[p]:
-                hinted_cards = []
-                for id in possible_hints[p]:
-                    
-                
+            number_ID = self.ambi_number(state, state.hands[p].cards)
+            color_ID = self.ambi_color(state, state.hands[p].cards)
+            if number_ID != -1:
+                return [p, number_ID, "number"]
+            if color_ID != -1:
+                return [p, color_ID, "color"]
             p = (p + 1) % len(state.players)
-        
+        return -1
+        # either must implement imaginary stacks in this function or in the convention functions.
 
     def is_critical(self, state, color, number):
         # checks if is_last or if is_playable
@@ -216,34 +228,33 @@ class Player:
         # DO NOT CALL ON YOURSELF
         out = []
         if c_or_n == "color":
-            for i in range(clist):
-                if clist.color == attr:
+            for i in xrange(len(clist)):
+                if clist[i].color == attr:
                     out.append(clist[i].ID)
         elif c_or_n == "number":
-            for i in range(clist):
-                if clist.number == attr:
+            for i in xrange(len(clist)):
+                if clist[i].number == attr:
                     out.append(clist[i].ID)
         return out
 
     def ambi_number(self, state, clist):
         # checks whether or not all cards can be played (for Ambiguous Number Tactic)
         # returns ID of card to hint, -1 if nothing
-        # should not be called on yourself!
-        for i in range(len(clist)):
-            number_list = self.attribute_list(clist, "number", i.color)
+        for i in xrange(len(clist)):
+            number_list = self.attribute_list(clist, "number", clist[i].number)
             duplicate_check = set([c for c in number_list if number_list.count(c) == 1])
             for c in duplicate_check:
                 if self.playable(c.color, c.number, state.stacks):
                     return c.ID
         # put something in here regarding imaginary stacks in order to build higher
         return -1
-        
+
     def ambi_color(self, state, clist):
         # checks whether or not newest card can be played (for Ambiguous Color Tactic)
         # returns ID of card to hint, -1 if nothing
         # should not be called on yourself!
-        for i in range(len(clist)):
-            color_list = self.attribute_list(clist, "color", i.color)
+        for i in xrange(len(clist)):
+            color_list = self.attribute_list(clist, "color", clist[i].color)
             new_card = self.newest_card(color_list)
             if self.playable(new_card.color, new_card.number, state.stacks):
                 return new_card.ID
