@@ -42,7 +42,7 @@ class Player:
                     return self.warn_critical(state, p)
 
         # Case: give hints to players
-        possible_hints = []  # LIST OF IDS OF CARDS THAT CAN BE HINTED
+        possible_hints = []  # LIST OF LIST OF IDS OF CARDS THAT CAN BE HINTED
         for i in xrange(nplayers):
             ph_sublist = []  # possible hints for each
             if i == self.number:
@@ -52,7 +52,7 @@ class Player:
                     if self.playable(state.hands[i].cards[j].color, state.hands[i].cards[j].number, state.stacks):
                         ph_sublist.append(state.hands[i].cards[j].ID)
             possible_hints.append(ph_sublist)
-        # return self.select_hint(state, possible_hints, self.all_queues)
+        self.select_hint(state, possible_hints, self.all_queues)
 
         # Case: if nothing else can be done, discard
         return Action("discard", 0, None)
@@ -135,10 +135,24 @@ class Player:
                 return i
         return -1
 
-    def imaginary_stack(self, state, all_queues, nplayers):
-        # returns an imaginary stack based on what people know and are going to play. Method: generates lists that are concatenations of range(state.stacks[i]) and numbers in all_queues and finds the longest length of consecutive numbers in each list. Useless for now
-        imaginary_played = [set(xrange(state.stacks[i])) for i in xrange(len(state.stacks))]
-        for i in xrange(nplayers):
+    def imaginary_stacks(self, state, all_queues, nplayers):
+        # returns an imaginary stack based on what people know and are going to play. Plays must be in numerical order (ie R1 R2 R3), otherwise bad things will happen.
+        ext_stacks = state.stacks
+        for i in xrange(len(state.stacks)):
+            current_stack = state.stacks[i]
+            p = (self.number + 1) % nplayers
+            while p != self.number:
+                index = self.index_from_ID(state, self.all_queues[p][0])
+                if index == -1:
+                    continue
+                if state.hands[p].cards[index].number == current_stack:
+                    current_stack += 1
+                    ext_stacks[i] += 1
+                p = (p + 1) % nplayers
+        return ext_stacks
+
+        '''imaginary_played = [set(range(state.stacks[i])) for i in range(len(state.stacks))]
+        for i in range(nplayers):
             if i == self.number:
                 continue
             for id in self.all_queues[i]:
@@ -152,11 +166,30 @@ class Player:
             while n in imaginary_played[i]:
                 n += 1
             maxlengths[i] = n - 1
-        return maxlengths
+        return maxlengths'''
 
     def select_hint(self, state, possible_hints, all_queues):
-        pass
-        # todo: write function that optimizes the hints given to someone. Returns a hint action.
+        # primitive version prioritizes players nearest to current player in playing order above all else.
+        """
+        p = (self.number + 1) % len(state.players)
+        while p != self.number:
+            for hint in possible_hints[p]:
+                hinted_cards = []
+                for id in possible_hints[p]:
+                    pass
+                
+            p = (p + 1) % len(state.players)
+        """
+        # Temporary convention heavy version.
+        p = (self.number + 1) % len(state.players)
+        while p != self.number:
+            for hint in possible_hints[p]:
+                hinted_cards = []
+                for id in possible_hints[p]:
+                    
+                
+            p = (p + 1) % len(state.players)
+        
 
     def is_critical(self, state, color, number):
         # checks if is_last or if is_playable
@@ -191,3 +224,27 @@ class Player:
                 if clist.number == attr:
                     out.append(clist[i].ID)
         return out
+
+    def ambi_number(self, state, clist):
+        # checks whether or not all cards can be played (for Ambiguous Number Tactic)
+        # returns ID of card to hint, -1 if nothing
+        # should not be called on yourself!
+        for i in range(len(clist)):
+            number_list = self.attribute_list(clist, "number", i.color)
+            duplicate_check = set([c for c in number_list if number_list.count(c) == 1])
+            for c in duplicate_check:
+                if self.playable(c.color, c.number, state.stacks):
+                    return c.ID
+        # put something in here regarding imaginary stacks in order to build higher
+        return -1
+        
+    def ambi_color(self, state, clist):
+        # checks whether or not newest card can be played (for Ambiguous Color Tactic)
+        # returns ID of card to hint, -1 if nothing
+        # should not be called on yourself!
+        for i in range(len(clist)):
+            color_list = self.attribute_list(clist, "color", i.color)
+            new_card = self.newest_card(color_list)
+            if self.playable(new_card.color, new_card.number, state.stacks):
+                return new_card.ID
+        return -1
