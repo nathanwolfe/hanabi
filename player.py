@@ -71,10 +71,26 @@ class Player:
         return Action("discard", 0, None)
 
     def analyze(self, state, nplayers):
+        received_full = False
         for i in xrange(len(state.hands[self.number].cards)):
+            #Checks for full info cards
             i_duple = state.hands[self.number].info[i]
             if self.playable(i_duple[0], i_duple[1], state.stacks):
                 self.play_queue.append(state.hands[self.number].cards[i].ID)
+                received_full = True
+        last_hint = state.action_list[len(state.action_list)-1]
+        #Checks for number hint what was meant: Crit Disc or Ambi Hint
+        if last_hint.type == "number" and last_hint.player == self.number:
+            if 0 in last_hint.cards:
+                pass
+                #This is a Crit Disc.  Add it to the start of the hand.
+            for i in xrange(len(last_hint.cards)):
+                self.play_queue.append(state.hands[self.number].cards[last_hint[i]].ID)              
+        if last_hint.type == "color" and last_hint.player == self.number:
+            if 0 in last_hint.cards:
+                pass
+                #This is a Crit Disc.  Add it to the start of the hand.
+            self.play_queue.append(state.hands[self.number].cards[last_hint[i]].ID)         
 
     def rearrange(self, state):  # state: same as in move()
         # Rearrange your hand if you want to
