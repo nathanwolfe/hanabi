@@ -27,17 +27,17 @@ class Player:
 
         # Case: critical discard of next person
         next_discard = state.hands[next_p].cards[0]
-        if self.is_critical(state, next_discard.color, next_discard.number):
+        if self.is_critical(state, next_discard.color, next_discard.number) and state.hints > 0:
             print "Critical discard hint given."
             return self.warn_critical(state, next_p)
 
         # Case: there are playable cards in queue
         if len(self.play_queue) > 0:
             "Played first card in queue."
-            return Action("play", self.index_from_ID(self.play_queue.pop(0)), None)
+            return Action("play", self.index_from_ID(state, self.play_queue.pop(0)), None)
 
         # Case: critical discard of person 2 seats ahead
-        if not nplayers == 2:
+        if not nplayers == 2 and state.hints > 0:
             p = (self.number + 2) % nplayers  # start from next player on
             next_discard = state.hands[p].cards[0]
             if self.is_critical(state, next_discard.color, next_discard.number):
@@ -60,14 +60,17 @@ class Player:
         hint_triple = self.select_hint(state, possible_hints, self.all_queues)
         if hint_triple[1] != -1:
             # this print statement needs work...
-            print "Hinted to " + str(hint_triple[0]) + "the card at " + str(self.index_from_ID(hint_triple[1])) + "."
-            return Action(hint_triple[2], self.index_from_ID(hint_triple[1]), hint_triple[0])
+            print "Hinted to " + str(hint_triple[0]) + "the card at " + str(state.players[hint_triple[0]].index_from_ID(state, hint_triple[1])) + "."
+            for i in state.hands[hint_triple[0]].cards:
+                print " " + str(i.ID)
+            print hint_triple[1]
+            return Action(hint_triple[2], state.players[hint_triple[0]].index_from_ID(state, hint_triple[1]), hint_triple[0])
 
         # Case: if nothing else can be done, discard
         print "Discarding."
         return Action("discard", 0, None)
 
-    def analyze(self, state):
+    def analyze(self, state, nplayers):
         for i in xrange(len(state.hands[self.number].cards)):
             i_duple = state.hands[self.number].info[i]
             if self.playable(i_duple[0], i_duple[1], state.stacks):
@@ -191,6 +194,8 @@ class Player:
             p = (p + 1) % len(state.players)
         """
         # Temporary convention heavy version.
+        if state.hints == 0:
+            return [-1, -1, -1]
         p = (self.number + 1) % len(state.players)
         while p != self.number:
             number_ID = self.ambi_number(state, state.hands[p].cards)
@@ -200,12 +205,12 @@ class Player:
             if color_ID != -1:
                 return [p, color_ID, "color"]
             p = (p + 1) % len(state.players)
-        return -1
+        return [-1, -1, -1]
         # either must implement imaginary stacks in this function or in the convention functions.
 
     def is_critical(self, state, color, number):
         # checks if is_last or if is_playable
-        if self.is_last(state, color, number) or self.playable(color, number, state.stacks):
+        if self.is_last(state, color, number):
             return True
         return False
 
@@ -215,9 +220,9 @@ class Player:
         assert not player == self.number
         color = state.hands[player].cards[0].color
         number = state.hands[player].cards[0].number
-        if self.attribute_list(state.hands[player].cards, "color", color) == 1:
+        if len(self.attribute_list(state.hands[player].cards, "color", color)) == 1:
             return Action("color", 0, player)
-        elif self.attribute_list(state.hands[player].cards, "number", number) == 1:
+        elif len(self.attribute_list(state.hands[player].cards, "number", number)) == 1:
             return Action("number", 0, player)
         else:
             return Action("color", 0, player)
@@ -241,7 +246,8 @@ class Player:
         # checks whether or not all cards can be played (for Ambiguous Number Tactic)
         # returns ID of card to hint, -1 if nothing
         for i in xrange(len(clist)):
-            number_list = self.attribute_list(clist, "number", clist[i].number)
+            ID_list = self.attribute_list(clist, "number", clist[i].number)
+            number_list = [clist[self.index_from_ID(state, i)] for i in ID_list]
             duplicate_check = set([c for c in number_list if number_list.count(c) == 1])
             for c in duplicate_check:
                 if self.playable(c.color, c.number, state.stacks):
@@ -252,9 +258,9 @@ class Player:
     def ambi_color(self, state, clist):
         # checks whether or not newest card can be played (for Ambiguous Color Tactic)
         # returns ID of card to hint, -1 if nothing
-        # should not be called on yourself!
         for i in xrange(len(clist)):
-            color_list = self.attribute_list(clist, "color", clist[i].color)
+            ID_list = self.attribute_list(clist, "color", clist[i].color)
+            color_list = [clist[self.index_from_ID(state, i)] for i in ID_list]
             new_card = self.newest_card(color_list)
             if self.playable(new_card.color, new_card.number, state.stacks):
                 return new_card.ID

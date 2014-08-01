@@ -107,8 +107,8 @@ def main():
             for i in xrange(len(visible.hands[p.number].cards)):
                 visible.hands[p.number].cards[i] = Card(-1, -1, visible.hands[p.number].cards[i].ID)
             for i in xrange(len(visible.deck.cards)):
-                visible.deck.cards[i] = Card(-1, -1, visible.deck.cards[i].turn_drawn, visible.deck.cards[i].ID)
-            p.analyze(visible)
+                visible.deck.cards[i] = Card(-1, -1, visible.deck.cards[i].ID)
+            p.analyze(visible, NUM_PLAYERS)
 
         for p in state.players:
             # censor each player's hands + the deck, then pass state for rearrangement
