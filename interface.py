@@ -95,10 +95,6 @@ def main():
         for k in state.hands[state.curplayer].cards:
             print k.to_string()
 
-        state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
-        curturn += 1
-        state.turns = curturn
-
         # recreate g_state and add to list of states
         print state.stacks
         for p in state.players:
@@ -110,15 +106,19 @@ def main():
                 visible.deck.cards[i] = Card(-1, -1, visible.deck.cards[i].ID)
             p.analyze(visible, NUM_PLAYERS)
 
-        for p in state.players:
-            # censor each player's hands + the deck, then pass state for rearrangement
-            visible = copy.deepcopy(state)
-            for i in xrange(len(visible.hands[p.number].cards)):
-                visible.hands[p.number].cards[i] = Card(-1, -1, visible.hands[p.number].cards[i].ID)
-            for i in xrange(len(visible.deck.cards)):
-                visible.deck.cards[i] = Card(-1, -1, visible.deck.cards[i].ID)
-            permutation = p.rearrange(visible)
-            state.hands[p.number].rearrange(permutation)
+        # Andrew - now only rearranges once per thingy
+        # censor each player's hands + the deck, then pass state for rearrangement
+        visible = copy.deepcopy(state)
+        for i in xrange(len(visible.hands[state.curplayer].cards)):
+            visible.hands[state.curplayer].cards[i] = Card(-1, -1, visible.hands[state.curplayer].cards[i].ID)
+        for i in xrange(len(visible.deck.cards)):
+            visible.deck.cards[i] = Card(-1, -1, visible.deck.cards[i].ID)
+        permutation = state.players[state.curplayer].rearrange(visible)
+        state.hands[state.curplayer].rearrange(permutation)
+
+        state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
+        curturn += 1
+        state.turns = curturn
 
         game.states.append(state)
         if len(state.deck.cards) == 0:
