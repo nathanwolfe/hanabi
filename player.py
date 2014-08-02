@@ -47,7 +47,7 @@ class Player:
 
         # Case: give hints to players
         possible_hints = []  # LIST OF LIST OF IDS OF CARDS THAT CAN BE HINTED
-        for i in xrange(nplayers):
+        for i in [(self.number + k) % nplayers for k in xrange(nplayers)]:
             ph_sublist = []  # possible hints for each
             if i == self.number:
                 continue
@@ -60,7 +60,7 @@ class Player:
         hint_triple = self.select_hint(state, possible_hints, self.all_queues)
         if hint_triple[1] != -1:
             # this print statement needs work...
-            print "Hinted to " + str(hint_triple[0]) + "the card at " + str(state.players[hint_triple[0]].index_from_ID(state, hint_triple[1])) + "."
+            print "Hinted to " + str(hint_triple[0]) + " the card at " + str(state.players[hint_triple[0]].index_from_ID(state, hint_triple[1])) + "."
             for i in state.hands[hint_triple[0]].cards:
                 print " " + str(i.ID)
             print hint_triple[1]
@@ -78,10 +78,10 @@ class Player:
             if self.playable(i_duple[0], i_duple[1], state.stacks):
                 self.play_queue.append(state.hands[self.number].cards[i].ID)
                 received_full = True
-        last_hint = state.action_list[len(state.action_list) - 1]
+        last_hint = state.action_list[-1]
         #Checks for number hint what was meant: Crit Disc or Ambi Hint
         if last_hint.type == "number" and last_hint.player == self.number:
-            if 0 in last_hint.cards:
+            if 0 in last_hint.cards and state.curplayer == (self.number - 1) % nplayers:
                 pass
                 #This is a Crit Disc.  Add it to the start of the hand.
             if not received_full:
@@ -90,7 +90,7 @@ class Player:
                         state.hands[self.number].cards[last_hint.cards[i]].ID
                     )
         if last_hint.type == "color" and last_hint.player == self.number:
-            if 0 in last_hint.cards:
+            if 0 in last_hint.cards and state.curplayer == (self.number - 1) % nplayers:
                 pass
                 #This is a Crit Disc.  Add it to the start of the hand.
             self.play_queue.append(
@@ -270,7 +270,17 @@ class Player:
         for i in xrange(len(clist)):
             ID_list = self.attribute_list(clist, "number", clist[i].number)
             number_list = [clist[self.index_from_ID(state, i)] for i in ID_list]
-            duplicate_check = set([c for c in number_list if number_list.count(c) == 1])
+            duplicate_list = []
+            for j in number_list:
+                for k in number_list:
+                    if j.color == k.color:
+                        duplicate_list.append(j)
+                        duplicate_list.append(k)
+            duplicate_check = []
+            for j in number_list:
+                if j not in duplicate_list:
+                    duplicate_check.append(j)
+
             for c in duplicate_check:
                 if self.playable(c.color, c.number, state.stacks):
                     return c.ID
