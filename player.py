@@ -42,8 +42,8 @@ class Player:
             next_discard = state.hands[p].cards[0]
             if self.is_critical(state, next_discard.color, next_discard.number):
                 if state.hints <= 1:
-                    print "Critical discard hint given."
-                    return self.warn_critical(state, p)
+                    print "Attempting to avoid critical discard"
+                    return Action("discard", 0, None)
 
         # Case: give hints to players
         possible_hints = []  # LIST OF LIST OF IDS OF CARDS THAT CAN BE HINTED
@@ -211,7 +211,6 @@ class Player:
                 hinted_cards = []
                 for id in possible_hints[p]:
                     pass
-                
             p = (p + 1) % len(state.players)
         """
         # Temporary convention heavy version.
@@ -221,6 +220,8 @@ class Player:
         while p != self.number:
             number_ID = self.ambi_number(state, state.hands[p].cards)
             color_ID = self.ambi_color(state, state.hands[p].cards)
+            print "Card: " + str(state.players[p].index_from_ID(state, number_ID))
+            print "Card: " + str(state.players[p].index_from_ID(state, color_ID))
             if number_ID != -1:
                 return [p, number_ID, "number"]
             if color_ID != -1:
