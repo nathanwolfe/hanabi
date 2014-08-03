@@ -8,8 +8,8 @@ import copy
 import deck_generator  # this is one of our own files
 import sys
 
-HAND_SIZE = 4
-NUM_PLAYERS = 5
+HAND_SIZE = 5
+NUM_PLAYERS = 3
 
 
 def game_end(game):
@@ -66,9 +66,10 @@ def main():
         # Censor information of player's own hand + the deck and then pass to the player for a move
         censored = copy.deepcopy(state)
         censored.hands[state.curplayer].cards = []
-        censored.players = []
         for i in xrange(len(censored.deck.cards)):
             censored.deck.cards[i] = Card(0, 0)
+        for i in xrange(len(censored.players)):
+            censored.players[i] = 0
         curmove = state.players[state.curplayer].move(censored)
         if curmove.type == "play":
             if not state.hands[state.curplayer].play(state, curmove.cards):
@@ -104,15 +105,18 @@ def main():
             visible.hands[p.number].cards = []
             for i in xrange(len(visible.deck.cards)):
                 visible.deck.cards[i] = Card(0, 0)
+            for i in xrange(len(censored.players)):
+                censored.players[i] = 0
             permutation = p.rearrange(visible)
             state.hands[p.number].rearrange(permutation)
-
         for p in state.players:
-            # censor hands + the deck then pass for lookaround
+            # censor handss + the deck then pass for lookaround
             visible = copy.deepcopy(state)
             visible.hands[p.number].cards = []
             for i in xrange(len(visible.deck.cards)):
                 visible.deck.cards[i] = Card(0, 0)
+            for i in xrange(len(censored.players)):
+                censored.players[i] = 0
             p.scan(visible)
         if len(state.deck.cards) == 0:
             final_countdown -= 1
