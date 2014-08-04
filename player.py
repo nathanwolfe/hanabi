@@ -216,6 +216,15 @@ class Player:
                         color_list.append(c)
                 self.all_queues[p].append(self.newest_card(color_list).ID)
                 return [p, color_ID, "color"]
+            else:  # basically just give full info about a card if you can't follow either convention.
+                for i in xrange(len(state.hands[p].cards)):
+                    # check whether they know at least one bit of info
+                    print "Hint will attempt to reveal full info"
+                    if self.playable(state.hands[p].cards[i].color, state.hands[p].cards[i].number, state.stacks):
+                        if state.hands[p].info[i][0] != -1:
+                            return [p, c.ID, "number"]
+                        elif state.hands[p].info[i][1] != -1:
+                            return [p, c.ID, "color"]
             p = (p + 1) % len(state.players)
         return [-1, -1, -1]
         # either must implement imaginary stacks in this function or in the convention functions.
