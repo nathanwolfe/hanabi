@@ -25,13 +25,12 @@ class Player:
         """
         next_p = (self.number + 1) % nplayers  # generally helpful index
 
-        """
         # Case: critical discard of next person
         next_discard = state.hands[next_p].cards[0]
         if self.is_critical(state, next_discard.color, next_discard.number) and state.hints > 0:
             print "Critical discard hint given."
             return self.warn_critical(state, next_p)
-        """
+
         # Case: there are playable cards in queue
         if len(self.play_queue) > 0:
             "Played first card in queue."
