@@ -13,7 +13,7 @@ class Card:
 
     def to_string(self):
         # with the color first because that's how you say it
-        return self.convert() + " " + str(self.number + 1)
+        return self.convert() + " " + str(self.number + 1) + "  --" + str(self.ID)
 
     def convert(self):
         # lowercase lettering should be the convention..

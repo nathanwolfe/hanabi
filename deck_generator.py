@@ -21,5 +21,4 @@ def generate():
         curr_card = random.randint(0, len(full_list) - 1)
         full_list[curr_card].ID = i
         final_list.append(full_list.pop(curr_card))
-    final_list[5].number = 4
     return Deck(final_list)

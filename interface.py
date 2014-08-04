@@ -38,7 +38,7 @@ def setup():
     hands = []
     for i in phands:
         hands.append(Hand(i, HAND_SIZE))
-    players = [Player(i) for i in range(NUM_PLAYERS)]  # initialize players
+    players = [Player(i, NUM_PLAYERS) for i in range(NUM_PLAYERS)]  # initialize players
 
     # if confused see the State constructor in state.py
     g_state = State(deck, discard_pile, lives, hints, card_stacks, hands, players, 0, 0)
@@ -91,9 +91,6 @@ def main():
             state.hints -= 1
             curmove.cards = hinted
         state.attach_action(curmove)
-        # debug
-        for k in state.hands[state.curplayer].cards:
-            print k.to_string()
 
         # recreate g_state and add to list of states
         print state.stacks
@@ -115,6 +112,10 @@ def main():
             visible.deck.cards[i] = Card(-1, -1, visible.deck.cards[i].ID)
         permutation = state.players[state.curplayer].rearrange(visible)
         state.hands[state.curplayer].rearrange(permutation)
+
+        # debug
+        for k in state.hands[state.curplayer].cards:
+            print k.to_string()
 
         state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
         curturn += 1

@@ -12,3 +12,5 @@ What if hinted a crit - do not play though?
 
 Also, ambi_number insensitivity
 
+select_hint should filter out cards that are already in a player's play queue
+
