@@ -173,6 +173,7 @@ class Player:
             self.restore(state, backup)
         return chosen_move
     
+    # Backs up the state to an array so it can be restored. Used in lieu of an actual copy operation.
     def backup(self, state):
         out = []
         out.append(copy.copy(state.deck))
@@ -186,7 +187,8 @@ class Player:
         out.append(state.players)
         out.append(state.curplayer)
         return out
-        
+    
+    # Restores the state from the backup.
     def restore(self, state, backup):
         state.deck = backup[0]
         state.discards = backup[1]
