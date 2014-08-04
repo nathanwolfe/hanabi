@@ -41,7 +41,7 @@ class Player:
                     return Action("discard", i, None)
             # Whatever, let's just discard something.
             return Action("discard", 0, None)
-        #print "Nothing playable."
+        # print "Nothing playable."
         # If someone has something playable that can be hinted unambiguously, hint that.
         for i in range(len(state.players)):
             if i == self.number: 

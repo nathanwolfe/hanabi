@@ -38,7 +38,7 @@ class Hand:
         self.draw(state)
 
     def hint(self, pos, type):  # for when someone hints this hand
-        # pos = card to hint, type = "color" or "number", val = 0 - 4
+        # pos = card to hint, type = "color" or "number"
         # returns list of hinted cards
         hinted = []
         for i in range(len(self.cards)):
