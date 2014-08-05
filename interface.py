@@ -14,15 +14,19 @@ NUM_PLAYERS = 2
 
 def game_end(game):
     # add more stuff later, this is a end game clean up function.
+    final_state = game.states[len(game.states) - 1]
     f = open("game_results.txt", "w")
     print "Game Over: Results"
-    print game.states[len(game.states) - 1].stacks
-    stacks_as_string = ", ".join(str(i) for i in game.states[len(game.states) - 1].stacks)
+    print final_state.stacks
+    stacks_as_string = ", ".join(str(i) for i in final_state.stacks)
     f.write(stacks_as_string + "\n")
-    print game.states[len(game.states) - 1].calc_score()
+    print final_state.calc_score()
     print "Hints:"
-    f.write("Score: " + str(game.states[len(game.states) - 1].calc_score()))
+    f.write("Score: " + str(final_state.calc_score()))
 
+    f.write("Discarded cards:\n")
+    for i in final_state.discards:
+        f.write(i.to_string() + str("\n"))
     sys.exit()  # just exits the program.
 
 
@@ -73,9 +77,11 @@ def main():
             censored.deck.cards[i] = Card(-1, -1, censored.deck.cards[i].ID)
         curmove = state.players[state.curplayer].move(censored, NUM_PLAYERS)
         if curmove.type == "play":
+            print "Card played: " + state.hands[state.curplayer].cards[curmove.cards].to_string()
             if not state.hands[state.curplayer].play(state, curmove.cards):
                 state.lives -= 1
         elif curmove.type == "discard":
+            print "Card destructioned: " + state.hands[state.curplayer].cards[curmove.cards].to_string()
             state.hands[state.curplayer].discard(state, curmove.cards)
             if state.hints < 8:
                 state.hints += 1

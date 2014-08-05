@@ -88,6 +88,8 @@ class Player:
                     for i in xrange(len(last_hint.cards)):
                         if state.hands[self.number].cards[last_hint.cards[i]].ID not in self.play_queue:
                             self.play_queue.append(state.hands[self.number].cards[last_hint.cards[i]].ID)
+                else:
+                    print "Overflow detected. Wiping up spill."
             if last_hint.type == "color" and last_hint.player == self.number:
                 color_list = []
                 for i in range(len(last_hint.cards)):
@@ -217,13 +219,13 @@ class Player:
                 print "Hint will attempt to reveal full info"
                 for i in xrange(len(state.hands[p].cards)):
                     # check whether they know at least one bit of info
-                    if self.playable(state.hands[p].cards[i].color, state.hands[p].cards[i].number, state.stacks) and c.ID not in self.all_queues[p]:
+                    if self.playable(state.hands[p].cards[i].color, state.hands[p].cards[i].number, state.stacks) and state.hands[p].cards[i].ID not in self.all_queues[p]:
                         if state.hands[p].info[i][0] != -1:
-                            print [p, c.ID, "number"]
-                            return [p, c.ID, "number"]
+                            # print [p, state.hands[p].cards[i].ID, "number"]
+                            return [p, state.hands[p].cards[i].ID, "number"]
                         elif state.hands[p].info[i][1] != -1:
-                            print [p, c.ID, "color"]
-                            return [p, c.ID, "color"]
+                            # print [p, state.hands[p].cards[i].ID, "color"]
+                            return [p, state.hands[p].cards[i].ID, "color"]
             p = (p + 1) % len(state.players)
         return [-1, -1, -1]
         # either must implement imaginary stacks in this function or in the convention functions.
@@ -247,7 +249,7 @@ class Player:
         elif len(self.attribute_list(state.hands[player].cards, "number", number)) == 1:
             return Action("number", 0, player)
         else:
-            return Action("color", 0, player)
+            return Action("number", 0, player)
 
     def attribute_list(self, clist, c_or_n, attr):
         # clist is a list of cards
@@ -310,10 +312,12 @@ class Player:
         else:
             return -1
 
+        """
         print "hintable_numbers_allplayable: " + str(hintable_numbers_allplayable)
         print "hintable_numbers_noneplayable: " + str(hintable_numbers_noneplayable)
         print "numlists: " + str(numlists)
         print "to_play: " + str(to_play)
+        """
         for c in clist:
             if c.number == to_play[0]:
                 return c.ID
