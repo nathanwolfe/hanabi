@@ -92,8 +92,6 @@ def main():
         # debug
         for k in state.hands[state.curplayer].cards:
             print k.to_string()
-        state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
-        curturn += 1
 
         # recreate g_state and add to list of states - WILL NEED TO BE CHANGED WHEN HINT IS ADDED
         # Why does this need to be changed? --Jerry
@@ -114,6 +112,10 @@ def main():
             for i in xrange(len(visible.deck.cards)):
                 visible.deck.cards[i] = Card(0, 0)
             p.scan(visible)
+        
+        state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
+        curturn += 1
+        
         if len(state.deck.cards) == 0:
             final_countdown -= 1
         if state.lives <= 0 or state.calc_score() == 25 or final_countdown == 0:
