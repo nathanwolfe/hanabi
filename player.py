@@ -13,6 +13,9 @@ class Player:
         self.xplayable = []
         self.drew = False
 
+    def move(self, newstate):
+        self.state = newstate
+
     def rearrange(self, newstate):
         self.oldstate = self.state
         self.state = newstate
