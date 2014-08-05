@@ -11,14 +11,41 @@ class Player:
         self.oldstate = None
         self.hplayable = [False, False, False, False, False]
         self.xplayable = []
+        self.hage = [4, 3, 2, 1, 0]
+        self.xage = {}
         self.drew = False
+        self.initage = True
 
     def move(self, newstate):
         self.state = newstate
+        if self.initage:
+            for i in range(len(self.state.hands)):
+                if i != self.number:
+                    for j in range(len(self.state.hands[i].cards)):
+                        self.xage[self.state.hands[i].cards[j]] = 4 - j
+            self.initage = False
 
     def rearrange(self, newstate):
         self.oldstate = self.state
         self.state = newstate
+        if self.initage:
+            for i in range(len(self.state.hands)):
+                if i != self.number:
+                    if i == self.oldstate.curplayer and self.state.action.type == "discard":
+                        for j in range(len(self.state.hands[i].cards)):
+                            self.xage[self.state.hands[i].cards[j]] = 5 - j
+                        self.xage[self.state.hands[i].cards[0]] = 0
+                    else:
+                        for j in range(len(self.state.hands[i].cards)):
+                            self.xage[self.state.hands[i].cards[j]] = 4 - j
+            self.initage = False
+        else:
+            for card in self.state.hands[self.oldstate.curplayer].cards:
+                if card in self.xage:
+                    self.xage[card] += 1
+                else:
+                    self.xage[card] = 0
+                        
         handsize = len(self.state.hands[self.number].info)
         if self.state.action.type in ["number", "color"] and len(self.state.action.cards) == 1:
             if self.state.action.player == self.number:
@@ -55,6 +82,7 @@ class Player:
             else:
                 hasinfo.append([False, handsize-1])
             self.hplayable.append(False)
+            self.drew = False
         temphplayable = [self.hplayable[hasinfo[i][1]] for i in range(handsize)]
         self.hplayable = temphplayable
         return [hasinfo[i][1] for i in range(handsize)]
