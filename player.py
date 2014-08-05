@@ -77,26 +77,23 @@ class Player:
 
         last_hint = state.action_list[-1]
         # Checks for number hint what was meant: Crit Disc or Ambi Hint
-        if last_hint.type == "number" and last_hint.player == self.number:
-            ''''if 0 in last_hint.cards and state.curplayer == (self.number - 1) % nplayers:
-                # This is a Crit Disc.  Add it to the start of the hand.
-                pass
-            else:'''
-            if not received_full:
-                for i in xrange(len(last_hint.cards)):
-                    if state.hands[self.number].cards[last_hint.cards[i]].ID not in self.play_queue:
-                        self.play_queue.append(state.hands[self.number].cards[last_hint.cards[i]].ID)
-        if last_hint.type == "color" and last_hint.player == self.number:
-            ''''if 0 in last_hint.cards and state.curplayer == (self.number - 1) % nplayers:
-                # This is a Crit Disc.  Add it to the start of the hand.
-                pass
-            el'''
-            if not received_full:
+        if not received_full:
+            if last_hint.type == "number" and last_hint.player == self.number:
+                # first check to see if all the cards are playable!
+                num_stacks_playable = 0
+                for i in xrange(len(state.stacks)):
+                    if state.stacks[i] == state.hands[self.number].info[last_hint.cards[0]][1]:  # if the ith stack's value is equal to the number that was hinted
+                        num_stacks_playable += 1
+                if num_stacks_playable >= len(last_hint.cards):
+                    for i in xrange(len(last_hint.cards)):
+                        if state.hands[self.number].cards[last_hint.cards[i]].ID not in self.play_queue:
+                            self.play_queue.append(state.hands[self.number].cards[last_hint.cards[i]].ID)
+            if last_hint.type == "color" and last_hint.player == self.number:
                 color_list = []
                 for i in range(len(last_hint.cards)):
                     color_list.append(state.hands[self.number].cards[last_hint.cards[i]])
                 self.play_queue.append(self.newest_card(color_list).ID)
-            
+
     def rearrange(self, state):  # state: same as in move()
         # Rearrange your hand if you want to
         # takes the hand into two parts - moves older cards to the left (nearer to discard) and known cards to the right (or 5's)
@@ -217,13 +214,15 @@ class Player:
                 self.all_queues[p].append(self.newest_card(color_list).ID)
                 return [p, color_ID, "color"]
             else:  # basically just give full info about a card if you can't follow either convention.
+                print "Hint will attempt to reveal full info"
                 for i in xrange(len(state.hands[p].cards)):
                     # check whether they know at least one bit of info
-                    print "Hint will attempt to reveal full info"
-                    if self.playable(state.hands[p].cards[i].color, state.hands[p].cards[i].number, state.stacks):
+                    if self.playable(state.hands[p].cards[i].color, state.hands[p].cards[i].number, state.stacks) and c.ID not in self.all_queues[p]:
                         if state.hands[p].info[i][0] != -1:
+                            print [p, c.ID, "number"]
                             return [p, c.ID, "number"]
                         elif state.hands[p].info[i][1] != -1:
+                            print [p, c.ID, "color"]
                             return [p, c.ID, "color"]
             p = (p + 1) % len(state.players)
         return [-1, -1, -1]
@@ -241,7 +240,9 @@ class Player:
         assert not player == self.number
         color = state.hands[player].cards[0].color
         number = state.hands[player].cards[0].number
-        if len(self.attribute_list(state.hands[player].cards, "color", color)) == 1:
+        if number == 4:
+            return Action("number", 0, player)
+        elif len(self.attribute_list(state.hands[player].cards, "color", color)) == 1:
             return Action("color", 0, player)
         elif len(self.attribute_list(state.hands[player].cards, "number", number)) == 1:
             return Action("number", 0, player)
@@ -266,7 +267,6 @@ class Player:
     def ambi_number(self, state, clist, player):
         # checks whether or not all cards can be played (for Ambiguous Number Tactic)
         # returns ID of card to hint, -1 if nothing
-        # this still needs fixing
         numlists = [[] for i in range(5)]
         number = 0
         while number <= 4:
@@ -297,12 +297,12 @@ class Player:
             for j in xrange(len(state.stacks)):
                 if state.stacks[j] == i:
                     stack_number_size += 1
-                        
+
             if all_playable == 1:
                 hintable_numbers_allplayable.append([i, len(numlists[i])])
             if stack_number_size < len(numlists[i]):
                 hintable_numbers_noneplayable.append([i, len(numlists[i])])
-                
+
         if hintable_numbers_allplayable != []:
             to_play = max(hintable_numbers_allplayable, key=lambda x: x[1])
         elif hintable_numbers_noneplayable != []:
