@@ -28,6 +28,16 @@ class Player:
         for i in range(len(self.hplayable)):
             if self.hplayable[i]:
                 return Action("play", i, None)
+
+        playerlist = range(len(self.state.hands))
+        playerlist = playerlist[self.number + 1:] + playerlist[:self.number]
+
+        for player in playerlist:
+            for card in self.state.hands[player].cards:
+                if self.legal(card):
+                    for type in ["number", "color"]:
+                        if self.state.hands[player].cards[self.youngest(player, self.hintcards(type, player, card))] == card:
+                            return Action(type, self.state.hands[player].cards.index(card), player)
         
         return Action("discard", len(self.state.hands[self.number].info) - 1, None)
 
@@ -62,11 +72,7 @@ class Player:
                         mincard = card
                 self.hplayable[mincard] = True
             else:
-                mincard = None
-                for card in self.state.action.cards:
-                    if mincard == None or self.xage[self.state.hands[target].cards[card]] < self.xage[self.state.hands[target].cards[mincard]]:
-                        mincard = card
-                self.xplayable.append(self.state.hands[target].cards[mincard])
+                self.xplayable.append(self.state.hands[target].cards[self.youngest(target, self.state.action.cards)])
         if self.state.action.type in ["play", "discard"]:
             if self.state.curplayer == self.number:
                 del(self.hplayable[self.state.action.cards])
@@ -114,3 +120,22 @@ class Player:
             return True
         else:
             return False
+
+    def hintcards(self, type, target, card):
+        result = []
+        if type == "number":
+            for i in range(len(self.state.hands[target].cards)):
+                if self.state.hands[target].cards[i].number == card.number:
+                    result.append(i)
+        else:
+            for i in range(len(self.state.hands[target].cards)):
+                if self.state.hands[target].cards[i].color == card.color:
+                    result.append(i)
+        return result
+
+    def youngest(self, target, cards):
+        mincard = None
+        for card in cards:
+            if mincard == None or self.xage[self.state.hands[target].cards[card]] < self.xage[self.state.hands[target].cards[mincard]]:
+                mincard = card
+        return mincard
