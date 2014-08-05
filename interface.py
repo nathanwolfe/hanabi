@@ -8,8 +8,8 @@ import copy
 import deck_generator  # this is one of our own files
 import sys
 
-HAND_SIZE = 4
-NUM_PLAYERS = 5
+HAND_SIZE = 5
+NUM_PLAYERS = 3
 
 
 def game_end(game):

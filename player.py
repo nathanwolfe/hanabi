@@ -16,6 +16,9 @@ class Player:
         self.drew = False
         self.initage = True
 
+    def __deepcopy__(self, memo):
+        return None
+
     def move(self, newstate):
         self.state = newstate
         if self.initage:
@@ -32,18 +35,20 @@ class Player:
         playerlist = range(len(self.state.hands))
         playerlist = playerlist[self.number + 1:] + playerlist[:self.number]
 
-        for player in playerlist:
-            for card in self.state.hands[player].cards:
-                if self.legal(card):
-                    for type in ["number", "color"]:
-                        if self.state.hands[player].cards[self.youngest(player, self.hintcards(type, player, card))] == card:
-                            return Action(type, self.state.hands[player].cards.index(card), player)
+        if self.state.hints > 0:
+            for player in playerlist:
+                for card in self.state.hands[player].cards:
+                    if self.legal(card):
+                        for type in ["number", "color"]:
+                            if self.state.hands[player].cards[self.youngest(player, self.hintcards(type, player, card))] == card:
+                                return Action(type, self.state.hands[player].cards.index(card), player)
         
         return Action("discard", len(self.state.hands[self.number].info) - 1, None)
 
     def rearrange(self, newstate):
         self.oldstate = self.state
         self.state = newstate
+        curplayer = self.state.curplayer
         if self.initage:
             for i in range(len(self.state.hands)):
                 if i != self.number:
@@ -55,12 +60,6 @@ class Player:
                         for j in range(len(self.state.hands[i].cards)):
                             self.xage[self.state.hands[i].cards[j]] = 4 - j
             self.initage = False
-        else:
-            for card in self.state.hands[self.state.curplayer].cards:
-                if card in self.xage:
-                    self.xage[card] += 1
-                else:
-                    self.xage[card] = 0
                         
         handsize = len(self.state.hands[self.number].info)
         if self.state.action.type in ["number", "color"]:
@@ -76,12 +75,22 @@ class Player:
         if self.state.action.type in ["play", "discard"]:
             if self.state.curplayer == self.number:
                 del(self.hplayable[self.state.action.cards])
+                del(self.hage[self.state.action.cards])
+                for i in range(len(self.hage)):
+                    self.hage[i] += 1
                 self.hplayable.append(False)
+                self.hage.append(0)
                 self.drew = True
-            elif oldstate != None:
-                curcard = self.oldstate.hands[self.state.curplayer].cards[self.state.action.cards]
-                if curcard in self.xplayable:
-                    del(self.xplayable[self.xplayable.index(curcard)])
+            else:
+                for card in self.state.hands[curplayer].cards:
+                    if card in self.xage:
+                        self.xage[card] += 1
+                    else:
+                        self.xage[card] = 0
+                if self.oldstate != None:
+                    curcard = self.oldstate.hands[self.state.curplayer].cards[self.state.action.cards]
+                    if curcard in self.xplayable:
+                        del(self.xplayable[self.xplayable.index(curcard)])
         for i in range(handsize):
             if -1 not in self.state.hands[self.number].info[i]:
                 self.hplayable[i] = True
@@ -91,22 +100,23 @@ class Player:
                     if -1 not in self.state.hands[i].info[j] and self.state.hands[i].cards[j] not in self.xplayable:
                         self.xplayable.append(self.state.hands[i].cards[j])
         if self.drew:
-            del(self.hplayable(handsize - 1))
-        hasinfo = [[False, i] for i in range(len(self.hplayable))]
-        for i in range(len(hasinfo)):
-            if self.hplayable[i] #or self.state.hands[self.number].info[i] != [-1, -1]:
-                hasinfo[i][0] = True
+            del(self.hplayable[handsize - 1])
+            del(self.hage[handsize - 1])
+        hasinfo = [[self.hplayable[i], self.hage[i], i] for i in range(len(self.hplayable))]
         hasinfo.sort(reverse=True, key=lambda card: card[0])
         if self.drew:
             if False in zip(*hasinfo)[0]: # if the set of 0th elements of hasinfo has False in it
-                hasinfo.insert(zip(*hasinfo)[0].index(False), [False, handsize - 1])
+                hasinfo.insert(zip(*hasinfo)[0].index(False), [False, 0, handsize - 1])
             else:
-                hasinfo.append([False, handsize - 1])
+                hasinfo.append([False, 0, handsize - 1])
             self.hplayable.append(False)
+            self.hage.append(0)
             self.drew = False
-        temphplayable = [self.hplayable[hasinfo[i][1]] for i in range(handsize)]
+        temphplayable = [self.hplayable[hasinfo[i][2]] for i in range(handsize)]
+        temphage = [self.hage[hasinfo[i][2]] for i in range(handsize)]
         self.hplayable = temphplayable
-        return [hasinfo[i][1] for i in range(handsize)]
+        self.hage = temphage
+        return [hasinfo[i][2] for i in range(handsize)]
 
     def scan(self, newstate):
         self.state = newstate
@@ -116,7 +126,7 @@ class Player:
         for qcard in self.xplayable:
             if card.number == qcard.number and card.color == qcard.color:
                 match = True
-        if self.state.stacks[card.color] == card.number and not match:
+        if self.state.stacks[card.color] == card.number and match == False:
             return True
         else:
             return False
@@ -136,6 +146,11 @@ class Player:
     def youngest(self, target, cards):
         mincard = None
         for card in cards:
+            if self.state.hands[target].cards[card] not in self.xage:
+                print("card")
+                self.xage[self.state.hands[target].cards[card]] = 0
+            if mincard != None and self.state.hands[target].cards[mincard] not in self.xage:
+                print("mincard")
             if mincard == None or self.xage[self.state.hands[target].cards[card]] < self.xage[self.state.hands[target].cards[mincard]]:
                 mincard = card
         return mincard
