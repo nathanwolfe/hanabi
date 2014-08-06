@@ -124,8 +124,8 @@ class Player:
             tmp = 0
             for i in range(discard.size):
                 if discard[i].color == color and discard[i].number == number:
-                    tmp++
-                if tmp==2:
+                    tmp+=1
+                if tmp == 2:
                     return True
         return False
         
