@@ -25,28 +25,18 @@ class Player:
         """
         next_p = (self.number + 1) % nplayers  # generally helpful index
 
-        ''''# Case: critical discard of next person
         next_discard = state.hands[next_p].cards[0]
-        if self.is_critical(state, next_discard.color, next_discard.number) and state.hints > 0:
-            print "Critical discard hint given."
-            return self.warn_critical(state, next_p)'''
+        
+        if state.hints == 1:
+            if self.is_critical(state, next_discard.color, next_discard.number) and state.hints > 0:
+                print "Critical discard hint given."
+                return self.warn_critical(state, next_p)
 
         # Case: there are playable cards in queue
         if len(self.play_queue) > 0:
             print "Play_queue: " + str(self.play_queue)
             print "Played the card at index: " + str(self.index_from_ID(state, self.play_queue[0], self.number))
             return Action("play", self.index_from_ID(state, self.play_queue.pop(0), self.number), None)
-
-        """
-        # Case: critical discard of person 2 seats ahead
-        if not nplayers == 2 and state.hints > 0:
-            p = (self.number + 2) % nplayers  # start from next player on
-            next_discard = state.hands[p].cards[0]
-            if self.is_critical(state, next_discard.color, next_discard.number):
-                if state.hints <= 1:
-                    print "Attempting to avoid critical discard"
-                    return Action("discard", 0, None)
-        """
 
         # Case: give hints to players
         # assuming select_hint returns a triple [player, ID, hint type]
