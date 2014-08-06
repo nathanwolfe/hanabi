@@ -38,7 +38,8 @@ class Player:
             # So everything has info, so let's discard something with only one piece of info.
             for i in range(state.hands[self.number].size):
                 if state.hands[self.number].info[i][0] == -1 or state.hands[self.number].info[i][1] == -1:
-                    return Action("discard", i, None)
+                    if state.hands[self.number].info[i][1] != 4 or state.hands[self.number]:
+                        return Action("discard", i, None)
             # Whatever, let's just discard something.
             return Action("discard", 0, None)
         # print "Nothing playable."
@@ -103,6 +104,34 @@ class Player:
             return True
         else:
             return False
+            
+    def last(self, color, number, discard):  #Checks if the card is the last of that type
+        if number == 5:
+            return True
+        for i in range(NUM_PLAYERS):    #Do other players have it
+            for j in range(state.hands[i].size):
+                if i != self.number:
+                    if state.hands[i].cards[j].color == color and state.hands[i].cards[j].number == number:
+                        return False
+        for i in range(state.hands[self.number].size):   #Do you have it
+            if state.hands[self.number].info[i][0] == color and state.hands[self.number].info[i][1] == number:
+                return False
+        if number >= 2 and number <= 4:  #Check the discard pile
+            for i in range(discard.size):
+                if discard[i].color == color and discard[i].number == number:
+                    return True
+        if number == 1:
+            tmp = 0
+            for i in range(discard.size):
+                if discard[i].color == color and discard[i].number == number:
+                    tmp++
+                if tmp==2:
+                    return True
+        return False
+        
+            
+        
+        
     
     def unique(self, value, cards, type):  # Checks uniqueness of a value in a hand.
         #type = 0 -> color, type = 1 -> number
