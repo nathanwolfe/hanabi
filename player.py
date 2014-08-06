@@ -67,7 +67,7 @@ class Player:
             if target == self.number:
                 mincard = None
                 for card in self.state.action.cards:
-                    if mincard == None or self.hage[card] < self.hage[mincard]:
+                    if (mincard == None or self.hage[card] < self.hage[mincard]) and self.hplayable[card] == False:
                         mincard = card
                 self.hplayable[mincard] = True
             else:
@@ -151,6 +151,6 @@ class Player:
                 self.xage[self.state.hands[target].cards[card]] = 0
             if mincard != None and self.state.hands[target].cards[mincard] not in self.xage:
                 print("mincard")
-            if mincard == None or self.xage[self.state.hands[target].cards[card]] < self.xage[self.state.hands[target].cards[mincard]]:
+            if (mincard == None or self.xage[self.state.hands[target].cards[card]] < self.xage[self.state.hands[target].cards[mincard]]) and card not in self.xplayable:
                 mincard = card
         return mincard

@@ -20,6 +20,7 @@ def game_end(game):
     stacks_as_string = ", ".join(str(i) for i in game.states[len(game.states) - 1].stacks)
     f.write(stacks_as_string + "\n")
     print game.states[len(game.states) - 1].calc_score()
+    print game.states[len(game.states) - 1].lives
     f.write("Score: " + str(game.states[len(game.states) - 1].calc_score()))
 
     sys.exit()  # just exits the program.
