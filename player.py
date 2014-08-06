@@ -19,28 +19,46 @@ class Player:
         Order of Cases:
         critical discard of next person
         there are playable cards in queue
-        critical discard of person later one
+        critical discard of person later one [REMOVED]
+        prioritize hints
         give hints to players
         if nothing else can be done, discard
         """
         next_p = (self.number + 1) % nplayers  # generally helpful index
-
+        """
         next_discard = state.hands[next_p].cards[0]
-        
-        if state.hints == 1:
+        a_hint = self.select_hint(state)
+        a_card = state.hands[next_p].cards[self.index_from_ID(state, a_hint[1], a_hint[0])]  # the card that may be hinted instead of crit discard
+        # Case: critical discard of next person
+        if state.hints == 1 or len(self.all_queues[next_p]) == 0 or not (self.playable(a_card.color, a_card.number, state.stacks) or a_hint[2] == "color"):
             if self.is_critical(state, next_discard.color, next_discard.number) and state.hints > 0:
                 print "Critical discard hint given."
                 return self.warn_critical(state, next_p)
-
+        """
         # Case: there are playable cards in queue
         if len(self.play_queue) > 0:
             print "Play_queue: " + str(self.play_queue)
             print "Played the card at index: " + str(self.index_from_ID(state, self.play_queue[0], self.number))
             return Action("play", self.index_from_ID(state, self.play_queue.pop(0), self.number), None)
 
-        # Case: give hints to players
+        # Prioritize hints to players
         # assuming select_hint returns a triple [player, ID, hint type]
-        hint_triple = self.select_hint(state, self.all_queues)
+        cur_p = (self.number + 1) % nplayers
+        poss_hints = []  # possible hint for each player
+        hint_triple = self.select_hint(state)
+        hint_card = state.hands[cur_p].cards[self.index_from_ID(state, hint_triple[1], cur_p)]
+        if hint_triple[1] != -1 and (self.playable(hint_card.color, hint_card.number, state.stacks) or hint_triple[2] == "color"):
+            print "Hinted to " + str(hint_triple[0]) + " the card at " + str(state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0])) + "."
+            if hint_triple[2] == "color":
+                print "Color hinted."
+            elif hint_triple[2] == "number":
+                print "Number hinted."
+            return Action(hint_triple[2], state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0]), hint_triple[0])
+        elif hint_triple[1] != -1:
+            poss_hints.append(hint_triple)
+        cur_p = (cur_p + 1) % nplayers
+        """"
+        # Case: give hints to players
         print hint_triple
         if hint_triple[1] != -1:
             # this print statement needs work...
@@ -51,7 +69,7 @@ class Player:
                 print "Number hinted."
             print state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0])
             return Action(hint_triple[2], state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0]), hint_triple[0])
-
+        """
         # Case: if nothing else can be done, discard
         print "Discarding."
         return Action("discard", 0, None)
@@ -175,7 +193,7 @@ class Player:
                 p = (p + 1) % nplayers
         return ext_stacks
 
-    def select_hint(self, state, all_queues):
+    def select_hint(self, state):
         # primitive version prioritizes players nearest to current player in playing order above all else.
         if state.hints == 0:
             return [-1, -1, -1]
@@ -183,7 +201,7 @@ class Player:
         while p != self.number:
             relevant_cards = []  # to prevent duplicate hints, etc.
             for c in state.hands[p].cards:
-                if c.ID not in all_queues[p]:
+                if c.ID not in self.all_queues[p]:
                     relevant_cards.append(c)
 
             number_ID = self.ambi_number(state, relevant_cards, p)
@@ -311,29 +329,6 @@ class Player:
         for c in clist:
             if c.number == to_play[0]:
                 return c.ID
-        """
-        for i in xrange(len(clist)):
-            ID_list = self.attribute_list(clist, "number", clist[i].number)
-            number_list = [clist[self.index_from_ID(state, i)] for i in ID_list]
-            duplicate_list = []
-            for j in number_list:
-                for k in number_list:
-                    if j.number == k.number and j.color == k.color:
-                        continue
-                    if j.color == k.color:
-                        duplicate_list.append(j)
-                        duplicate_list.append(k)
-            duplicate_check = []
-            print "duplicate_list: " + str(duplicate_list)
-            for j in number_list:
-                if j not in duplicate_list:
-                    duplicate_check.append(j)
-            for c in duplicate_check:
-                if self.playable(c.color, c.number, state.stacks):
-                    return c.ID
-        # put something in here regarding imaginary stacks in order to build higher
-        return -1
-        """
 
     def ambi_color(self, state, clist, p):
         # checks whether or not newest card can be played (for Ambiguous Color Tactic)

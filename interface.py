@@ -134,5 +134,4 @@ def main():
             if state.lives <= 0:
                 print "btdubs you died"
             game_end(game)
-
 main()

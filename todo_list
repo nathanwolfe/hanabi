@@ -4,13 +4,9 @@ card counting
 If a multi number hint reveals all info about at least one card, do not add the rest to the play queue
 multi color will first add fully known, if none then add newest
 
-Analyze: shift play_queue order based on clues given to others later
 TODO:
-Also, problems with index_from_ID()!!
-
-What if hinted a crit - do not play though?
-
-Also, ambi_number insensitivity
+Analyze: shift play_queue order based on clues given to others later
 
 select_hint should filter out cards that are already in a player's play queue
 
+Prioritize giving full info before overflow ambi_number?
