@@ -36,9 +36,8 @@ class Player:
                 if state.hands[self.number].info[i][0] == -1 and state.hands[self.number].info[i][1] == -1:
                     return Action("discard", i, None)
             # So everything has info, so let's discard something with only one piece of info, unless it is a 5
+            
             #Discard useless cards:
-            for i in range(state.hands[self.number].size):
-                if(useless(self, state.hands[self.number].info[i][0], state.hands[self.number].info[i][1]))
             for i in range(state.hands[self.numer].size):
                 if useless(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1]):
                     return Action("discard", i, None)
@@ -149,10 +148,6 @@ class Player:
                     return false
             return true
         return false
-        
-        
-        
-        
     
     def unique(self, value, cards, type):  # Checks uniqueness of a value in a hand.
         #type = 0 -> color, type = 1 -> number
