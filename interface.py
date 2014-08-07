@@ -15,19 +15,19 @@ NUM_PLAYERS = 3
 def game_end(game):
     # add more stuff later, this is a end game clean up function.
     final_state = game.states[len(game.states) - 1]
-    f = open("game_results.txt", "w")
+    f = open("game_results.txt", "a")
     print "Game Over: Results"
     print final_state.stacks
     stacks_as_string = ", ".join(str(i) for i in final_state.stacks)
-    f.write(stacks_as_string + "\n")
+#    f.write(stacks_as_string + "\n")
     print final_state.calc_score()
     print "Hints:"
-    f.write("Score: " + str(final_state.calc_score()))
+    f.write("Score: " + str(final_state.calc_score()) + "\n")
 
-    f.write("Discarded cards:\n")
-    for i in final_state.discards:
-        f.write(i.to_string() + str("\n"))
-    sys.exit()  # just exits the program.
+#    f.write("Discarded cards:\n")
+#    for i in final_state.discards:
+#        f.write(i.to_string() + str("\n"))
+#    sys.exit()  # just exits the program.
 
 
 def setup():
@@ -134,4 +134,7 @@ def main():
             if state.lives <= 0:
                 print "btdubs you died"
             game_end(game)
-main()
+        break
+            
+for i in range(10):
+    main()
