@@ -19,15 +19,16 @@ def game_end(game):
     print "Game Over: Results"
     print final_state.stacks
     stacks_as_string = ", ".join(str(i) for i in final_state.stacks)
-    #    f.write(stacks_as_string + "\n")
+    f.write(stacks_as_string + "\n")
     print final_state.calc_score()
-    print "Hints:"
-    f.write("Score: " + str(final_state.calc_score()) + "\n")
+    # print "Hints:"
+    f.write("Score: " + str(final_state.calc_score()))
 
-    #    f.write("Discarded cards:\n")
-    #    for i in final_state.discards:
-    #        f.write(i.to_string() + str("\n"))
-    #    sys.exit()  # just exits the program.
+    f.write("Discarded cards:\n")
+    for i in final_state.discards:
+        f.write(i.to_string() + str("\n"))
+    # sys.exit()  # just exits the program.
+
 
 def write_to_file(game):
     final_state = game.states[len(game.states) - 1]
