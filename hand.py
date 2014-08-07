@@ -12,6 +12,7 @@ class Hand:
     def play(self, state, n):
         # returns True if is_valid() is true, False if not
         self.draw(state)  # this needs to go first since this function actually returns stuff
+        print "played", self.cards[n].number, self.cards[n].color, n
         if self.is_valid(n, state):
             state.stacks[self.cards[n].color] += 1
             if state.stacks[self.cards[n].color] == 5 and state.hints < 8:

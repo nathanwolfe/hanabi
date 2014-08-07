@@ -11,20 +11,22 @@ class Player:
         self.oldstate = None
         self.playable = None
         self.age = None
-        self.drew = False
-        self.init = True
+        self.binit = True
 
     def __deepcopy__(self, memo):
         return None
 
     def move(self, newstate):
         self.state = newstate
-        if self.init:
-            self.playable = [[False] * len(self.state.hands[0].info)] * len(self.state.hands)
-            rage = range(len(self.state.hands[0].info))
-            rage.reverse()
-            self.age = [list(rage)] * 3
-            self.init = False
+        handsize = self.state.hands[self.number].size
+
+        if self.binit:
+            self.playable = []
+            self.age = []
+            for i in range(len(self.state.hands)):
+                self.playable.append([False for j in range(handsize)])
+                self.age.append([handsize - j - 1 for j in range(handsize)])
+            self.binit = False
 
         for i in range(len(self.playable[self.number])):
             if self.playable[self.number][i]:
@@ -39,6 +41,7 @@ class Player:
                     if self.legal(card):
                         for type in ["number", "color"]:
                             if self.state.hands[player].cards[self.youngest(player, self.hintcards(type, player, card))] == card:
+                                print "hinting", card.number, card.color, "pos", self.state.hands[player].cards.index(card), "player", player + 1
                                 return Action(type, self.state.hands[player].cards.index(card), player)
         
         return Action("discard", len(self.state.hands[self.number].info) - 1, None)
@@ -47,14 +50,17 @@ class Player:
         self.oldstate = self.state
         self.state = newstate
         curplayer = self.state.curplayer
-        if self.init:
-            self.playable = [[False] * len(self.state.hands[0].info)] * len(self.state.hands)
-            rage = range(len(self.state.hands[0].info))
-            rage.reverse()
-            self.age = [list(rage)] * 3
-            self.init = False
                         
-        handsize = len(self.state.hands[self.number].info)
+        handsize = self.state.hands[self.number].size
+        permute = list(range(handsize))
+
+        if self.binit:
+            self.playable = []
+            self.age = []
+            for i in range(len(self.state.hands)):
+                self.playable.append([False for j in range(handsize)])
+                self.age.append([handsize - j - 1 for j in range(handsize)])
+            self.binit = False
 
         if self.state.action.type in ["number", "color"]:
             tplayer = self.state.action.player
@@ -63,37 +69,28 @@ class Player:
             del(self.playable[tplayer][tcard])
             self.playable[tplayer].insert(0, True)
             self.age[tplayer].insert(0, tage)
+            if tplayer == self.number:
+                print "player", self.number + 1, "received hint pos", tcard
+                tpos = permute.pop(tcard)
+                permute.insert(0, tpos)
 
         if self.state.action.type in ["play", "discard"]:
             pcard = self.state.action.cards
             del(self.playable[curplayer][pcard])
             del(self.age[curplayer][pcard])
             self.age[curplayer] = [a + 1 for a in self.age[curplayer]]
-            if False in self.playable[curplayer]:
-                pos = self.playable[curplayer].index(False)
-            else:
-                pos = 0
-            self.playable[curplayer].insert(pos, False)
-            self.age[curplayer].insert(pos, 0)
 
-        if self.drew:
-            del(self.hplayable[handsize - 1])
-            del(self.hage[handsize - 1])
-        hasinfo = [[self.hplayable[i], self.hage[i], i] for i in range(len(self.hplayable))]
-        hasinfo.sort(reverse=True, key=lambda card: card[0])
-        if self.drew:
-            if False in zip(*hasinfo)[0]: # if the set of 0th elements of hasinfo has False in it
-                hasinfo.insert(zip(*hasinfo)[0].index(False), [False, 0, handsize - 1])
-            else:
-                hasinfo.append([False, 0, handsize - 1])
-            self.hplayable.append(False)
-            self.hage.append(0)
-            self.drew = False
-        temphplayable = [self.hplayable[hasinfo[i][2]] for i in range(handsize)]
-        temphage = [self.hage[hasinfo[i][2]] for i in range(handsize)]
-        self.hplayable = temphplayable
-        self.hage = temphage
-        return [hasinfo[i][2] for i in range(handsize)]
+            if self.oldstate == None or self.state.hands[curplayer].size == self.oldstate.hands[curplayer].size:
+                pos = 0
+                if False in self.playable[curplayer]:
+                    pos = self.playable[curplayer].index(False)
+                self.playable[curplayer].insert(pos, False)
+                self.age[curplayer].insert(pos, 0)
+                if curplayer == self.number:
+                    del(permute[handsize - 1])
+                    permute.insert(pos, handsize - 1)
+
+        return permute
 
     def scan(self, newstate):
         self.state = newstate
@@ -122,6 +119,7 @@ class Player:
             for i in range(len(self.state.hands[target].cards)):
                 if self.state.hands[target].cards[i].color == card.color:
                     result.append(i)
+        # print result
         return result
 
     def youngest(self, target, cards):
