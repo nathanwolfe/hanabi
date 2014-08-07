@@ -6,10 +6,9 @@ from player import Player
 from hand import Hand
 import copy
 import deck_generator  # this is one of our own files
-import sys
 
-HAND_SIZE = 4
-NUM_PLAYERS = 5
+HAND_SIZE = 5
+NUM_PLAYERS = 3
 scores = [0 for i in range(26)]
 
 
@@ -20,20 +19,16 @@ def game_end(game):
     print "Game Over: Results"
     print final_state.stacks
     stacks_as_string = ", ".join(str(i) for i in final_state.stacks)
-    #    f.write(stacks_as_string + "\n")
+    f.write(stacks_as_string + "\n")
     print final_state.calc_score()
     scores[final_state.calc_score()] += 1
     print "Hints:"
     f.write("Score: " + str(final_state.calc_score()) + "\n")
 
-    #    f.write("Discarded cards:\n")
-    #    for i in final_state.discards:
-    #        f.write(i.to_string() + str("\n"))
-    #    sys.exit()  # just exits the program.
-
-def write_to_file(game):
-    final_state = game.states[len(game.states) - 1]
-    f = open("scores.txt", )
+    f.write("Discarded cards:\n")
+    for i in final_state.discards:
+        f.write(i.to_string() + str("\n"))
+    # sys.exit()  # just exits the program.
 
 
 def setup():
@@ -62,9 +57,9 @@ def main():
 
     # print out all the cards of all the players for debug
     for i in game.states[0].hands:
-        # print "----------P" + str(game.states[0].curplayer + 1) + "-----------"
-        # for j in i.cards:
-            # print j.to_string()
+        print "----------P" + str(game.states[0].curplayer + 1) + "-----------"
+        for j in i.cards:
+            print j.to_string()
         game.states[0].curplayer += 1
 
     game.states[0].curplayer = 0  # setting back to 0
@@ -74,7 +69,7 @@ def main():
         # idea: copy current state, make moves, put this modified state as the new state
         # at end of states list of game, let players rearrange hand, let players look around.
         state = game.states[curturn]
-        # print "----------P" + str(state.curplayer + 1) + "-----------"
+        print "----------P" + str(state.curplayer + 1) + "-----------"
         # Censor information of player's own hand + the deck and then pass to the player for a move
         censored = copy.deepcopy(state)
         for i in xrange(len(censored.hands[state.curplayer].cards)):
@@ -83,11 +78,11 @@ def main():
             censored.deck.cards[i] = Card(-1, -1, censored.deck.cards[i].ID)
         curmove = state.players[state.curplayer].move(censored, NUM_PLAYERS)
         if curmove.type == "play":
-            # print "Card played: " + state.hands[state.curplayer].cards[curmove.cards].to_string()
+            print "Card played: " + state.hands[state.curplayer].cards[curmove.cards].to_string()
             if not state.hands[state.curplayer].play(state, curmove.cards):
                 state.lives -= 1
         elif curmove.type == "discard":
-            # print "Card destructioned: " + state.hands[state.curplayer].cards[curmove.cards].to_string()
+            print "Card destructioned: " + state.hands[state.curplayer].cards[curmove.cards].to_string()
             state.hands[state.curplayer].discard(state, curmove.cards)
             if state.hints < 8:
                 state.hints += 1
@@ -125,6 +120,9 @@ def main():
         permutation = state.players[state.curplayer].rearrange(visible)
         state.hands[state.curplayer].rearrange(permutation)
 
+        for i in state.hands[state.curplayer].cards:
+            print i.to_string()
+
         state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
         curturn += 1
         state.turns = curturn
@@ -137,7 +135,7 @@ def main():
                 print "btdubs you died"
             game_end(game)
             break
-
+"""
 ITER = 1000
 for i in range(ITER):
     main()
@@ -150,3 +148,5 @@ for i in range(ITER):
                 f.write(str(j) + ": " + str(scores[j]) + "\n")
                 total += j * scores[j]
         f.write("Average: " + str(total / float(ITER)))
+"""
+main()
