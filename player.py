@@ -45,7 +45,17 @@ class Player:
         # assuming select_hint returns a triple [player, ID, hint type]
         cur_p = (self.number + 1) % nplayers
         poss_hints = []  # possible hint for each player
-        hint_triple = self.select_hint(state)
+        hint_triples = []
+        for p in range(nplayers):
+            if p == self.number:
+                continue
+            hint_triples.append(self.select_hint(state, p))
+        hint_triple = [-1, -1, -1]
+        for h in hint_triples:
+            if h != [-1, -1, -1]:
+                hint_triple = h
+                break
+        print hint_triple
         hint_card = state.hands[cur_p].cards[self.index_from_ID(state, hint_triple[1], cur_p)]
         if hint_triple[1] != -1 and (self.playable(hint_card.color, hint_card.number, state.stacks) or hint_triple[2] == "color"):
             print "Hinted to " + str(hint_triple[0]) + " the card at " + str(state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0])) + "."
@@ -193,7 +203,40 @@ class Player:
                 p = (p + 1) % nplayers
         return ext_stacks
 
-    def select_hint(self, state):
+    def select_hint(self, state, p):
+        if state.hints == 0:
+            return [-1, -1, -1]
+        relevant_cards = []
+        for c in state.hands[p].cards:
+            if c.ID not in self.all_queues[p]:
+                relevant_cards.append(c)
+
+        number_ID = self.ambi_number(state, relevant_cards, p)
+        color_ID = self.ambi_color(state, relevant_cards, p)
+        number_ID_card = state.hands[p].cards[self.index_from_ID(state, number_ID, p)]
+        number_playable = 1
+        for c in state.hands[p].cards:
+            if c.number == number_ID_card.number and not self.playable(c.color, c.number, state.stacks):
+                number_playable = 0
+        if number_ID != -1 and number_playable == 1:
+            return [p, number_ID, "number"]
+        elif color_ID != -1:
+            color_list = []
+            for c in state.hands[p].cards:
+                if c.color == state.hands[p].cards[self.index_from_ID(state, number_ID, p)].color:
+                    color_list.append(c)
+            return [p, color_ID, "color"]
+        else:
+            print "Hint wil attempt to reveal full info"
+            for i in xrange(len(state.hands[p].cards)):
+                if self.playable(state.hands[p].cards[i].color, state.hands[p].cards[i].number, state.stacks) and state.hands[p].cards[i].ID not in self.all_queues[p]:
+                    if state.hands[p].info[i][0] != -1:
+                        return [p, state.hands[p].cards[i].ID, "number"]
+                    elif state.hands[p].info[i][1] != -1:
+                        return [p, state.hands[p].cards[i].ID, "color"]
+        return [-1, -1, -1]
+
+    def select_hint_old(self, state):
         # primitive version prioritizes players nearest to current player in playing order above all else.
         if state.hints == 0:
             return [-1, -1, -1]
