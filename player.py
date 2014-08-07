@@ -68,6 +68,7 @@ class Player:
             poss_hints.append(hint_triple)
         cur_p = (cur_p + 1) % nplayers
         """"
+
         # Case: give hints to players
         print hint_triple
         if hint_triple[1] != -1:
@@ -217,7 +218,15 @@ class Player:
             return [-1, -1, -1]
         relevant_cards = []
         for c in state.hands[p].cards:
-            if c.ID not in self.all_queues[p]:
+            relevant = 1
+            for q in xrange(len(self.all_queues)):
+                if q == self.number:
+                    continue
+                for r in xrange(len(self.all_queues[q])):
+                    queue_card = state.hands[q].cards[self.index_from_ID(state, self.all_queues[q][r], q)]
+                    if queue_card.color == c.color and queue_card.number == c.number:
+                        relevant = 0
+            if relevant == 1 and c.ID not in self.all_queues[p]:
                 relevant_cards.append(c)
 
         number_ID = self.ambi_number(state, relevant_cards, p)
