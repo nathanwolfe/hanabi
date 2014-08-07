@@ -88,14 +88,15 @@ class Player:
     def analyze(self, state, nplayers):
         received_full = False  # checks if the player has received full information about any one card
         last_hint = state.action_list[-1]
-        for i in xrange(len(state.hands[last_hint.player].cards)):
-            # Checks for full info cards
-            i_duple = state.hands[last_hint.player].info[i]
-            if self.playable(i_duple[0], i_duple[1], state.stacks) and state.hands[last_hint.player].cards[i].ID not in self.play_queue:
-                if self.number == last_hint.player:
-                    self.play_queue.append(state.hands[self.number].cards[i].ID)
-                self.all_queues[last_hint.player].append(state.hands[self.number].cards[i].ID)
-                received_full = True
+        if last_hint.player is not None:
+            for i in xrange(len(state.hands[last_hint.player].cards)):
+                # Checks for full info cards
+                i_duple = state.hands[last_hint.player].info[i]
+                if self.playable(i_duple[0], i_duple[1], state.stacks) and state.hands[last_hint.player].cards[i].ID not in self.play_queue:
+                    if self.number == last_hint.player:
+                        self.play_queue.append(state.hands[self.number].cards[i].ID)
+                    self.all_queues[last_hint.player].append(state.hands[self.number].cards[i].ID)
+                    received_full = True
 
         # Checks for number hint what was meant: Crit Disc or Ambi Hint
         if not received_full:
@@ -124,7 +125,7 @@ class Player:
         print self.all_queues
 
         if last_hint.type == "play":
-            self.all_queues[last_hint.player].pop(0)
+            self.all_queues[state.curplayer].pop(0)
 
     def rearrange(self, state):  # state: same as in move()
         # Rearrange your hand if you want to
