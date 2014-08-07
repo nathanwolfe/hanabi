@@ -37,8 +37,8 @@ class Player:
         """
         # Case: there are playable cards in queue
         if len(self.play_queue) > 0:
-            print "Play_queue: " + str(self.play_queue)
-            print "Played the card at index: " + str(self.index_from_ID(state, self.play_queue[0], self.number))
+            # print "Play_queue: " + str(self.play_queue)
+            # print "Played the card at index: " + str(self.index_from_ID(state, self.play_queue[0], self.number))
             return Action("play", self.index_from_ID(state, self.play_queue.pop(0), self.number), None)
 
         # Prioritize hints to players
@@ -55,14 +55,14 @@ class Player:
             if h != [-1, -1, -1]:
                 hint_triple = h
                 break
-        print hint_triple
+        # print hint_triple
         hint_card = state.hands[cur_p].cards[self.index_from_ID(state, hint_triple[1], cur_p)]
         if hint_triple[1] != -1 and (self.playable(hint_card.color, hint_card.number, state.stacks) or hint_triple[2] == "color"):
-            print "Hinted to " + str(hint_triple[0]) + " the card at " + str(state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0])) + "."
-            if hint_triple[2] == "color":
-                print "Color hinted."
-            elif hint_triple[2] == "number":
-                print "Number hinted."
+            # print "Hinted to " + str(hint_triple[0]) + " the card at " + str(state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0])) + "."
+            # if hint_triple[2] == "color":
+                # print "Color hinted."
+            # elif hint_triple[2] == "number":
+                # print "Number hinted."
             return Action(hint_triple[2], state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0]), hint_triple[0])
         elif hint_triple[1] != -1:
             poss_hints.append(hint_triple)
@@ -82,7 +82,7 @@ class Player:
             return Action(hint_triple[2], state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0]), hint_triple[0])
         """
         # Case: if nothing else can be done, discard
-        print "Discarding."
+        # print "Discarding."
         return Action("discard", 0, None)
 
     def analyze(self, state, nplayers):
@@ -92,10 +92,11 @@ class Player:
             for i in xrange(len(state.hands[last_hint.player].cards)):
                 # Checks for full info cards
                 i_duple = state.hands[last_hint.player].info[i]
-                if self.playable(i_duple[0], i_duple[1], state.stacks) and state.hands[last_hint.player].cards[i].ID not in self.play_queue:
-                    if self.number == last_hint.player:
+                if self.playable(i_duple[0], i_duple[1], state.stacks):
+                    if self.number == last_hint.player and state.hands[last_hint.player].cards[i].ID not in self.play_queue:
                         self.play_queue.append(state.hands[self.number].cards[i].ID)
-                    self.all_queues[last_hint.player].append(state.hands[self.number].cards[i].ID)
+                    if state.hands[last_hint.player].cards[i].ID not in self.all_queues[last_hint.player]:
+                        self.all_queues[last_hint.player].append(state.hands[last_hint.player].cards[i].ID)
                     received_full = True
 
         # Checks for number hint what was meant: Crit Disc or Ambi Hint
@@ -112,8 +113,8 @@ class Player:
                             if self.number == last_hint.player:
                                 self.play_queue.append(state.hands[self.number].cards[last_hint.cards[i]].ID)
                             self.all_queues[last_hint.player].append(state.hands[last_hint.player].cards[last_hint.cards[i]].ID)
-                else:
-                    print "Overflow detected. Wiping up spill."
+                # else:
+                    # print "Overflow detected. Wiping up spill."
             if last_hint.type == "color":
                 color_list = []
                 for i in range(len(last_hint.cards)):
@@ -122,7 +123,7 @@ class Player:
                     self.play_queue.append(self.newest_card(color_list).ID)
                 self.all_queues[last_hint.player].append(self.newest_card(color_list).ID)
 
-        print self.all_queues
+        # print self.all_queues
 
         if last_hint.type == "play":
             self.all_queues[state.curplayer].pop(0)
@@ -248,7 +249,7 @@ class Player:
                     color_list.append(c)
             return [p, color_ID, "color"]
         else:
-            print "Hint wil attempt to reveal full info"
+            # print "Hint wil attempt to reveal full info"
             for i in xrange(len(state.hands[p].cards)):
                 if self.playable(state.hands[p].cards[i].color, state.hands[p].cards[i].number, state.stacks) and state.hands[p].cards[i].ID not in self.all_queues[p]:
                     if state.hands[p].info[i][0] != -1:
@@ -288,7 +289,7 @@ class Player:
                 self.all_queues[p].append(self.newest_card(color_list).ID)
                 return [p, color_ID, "color"]
             else:  # basically just give full info about a card if you can't follow either convention.
-                print "Hint will attempt to reveal full info"
+                # print "Hint will attempt to reveal full info"
                 for i in xrange(len(state.hands[p].cards)):
                     # check whether they know at least one bit of info
                     if self.playable(state.hands[p].cards[i].color, state.hands[p].cards[i].number, state.stacks) and state.hands[p].cards[i].ID not in self.all_queues[p]:
@@ -399,7 +400,7 @@ class Player:
         # returns ID of card to hint, -1 if nothing
         for i in xrange(len(clist)):
             ID_list = self.attribute_list(clist, "color", clist[i].color)
-            print ID_list
+            # print ID_list
             color_list = []
             for j in clist:
                 if j.ID in ID_list:
