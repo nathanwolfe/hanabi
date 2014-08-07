@@ -9,27 +9,25 @@ class Player:
         self.number = n
         self.state = None
         self.oldstate = None
-        self.hplayable = [False, False, False, False, False]
-        self.xplayable = []
-        self.hage = [4, 3, 2, 1, 0]
-        self.xage = {}
+        self.playable = None
+        self.age = None
         self.drew = False
-        self.initage = True
+        self.init = True
 
     def __deepcopy__(self, memo):
         return None
 
     def move(self, newstate):
         self.state = newstate
-        if self.initage:
-            for i in range(len(self.state.hands)):
-                if i != self.number:
-                    for j in range(len(self.state.hands[i].cards)):
-                        self.xage[self.state.hands[i].cards[j]] = 4 - j
-            self.initage = False
+        if self.init:
+            self.playable = [[False] * len(self.state.hands[0].info)] * len(self.state.hands)
+            rage = range(len(self.state.hands[0].info))
+            rage.reverse()
+            self.age = [list(rage)] * 3
+            self.init = False
 
-        for i in range(len(self.hplayable)):
-            if self.hplayable[i]:
+        for i in range(len(self.playable[self.number])):
+            if self.playable[self.number][i]:
                 return Action("play", i, None)
 
         playerlist = range(len(self.state.hands))
@@ -49,56 +47,35 @@ class Player:
         self.oldstate = self.state
         self.state = newstate
         curplayer = self.state.curplayer
-        if self.initage:
-            for i in range(len(self.state.hands)):
-                if i != self.number:
-                    if i == self.state.curplayer and self.state.action.type == "discard":
-                        for j in range(len(self.state.hands[i].cards)):
-                            self.xage[self.state.hands[i].cards[j]] = 5 - j
-                        self.xage[self.state.hands[i].cards[0]] = 0
-                    else:
-                        for j in range(len(self.state.hands[i].cards)):
-                            self.xage[self.state.hands[i].cards[j]] = 4 - j
-            self.initage = False
+        if self.init:
+            self.playable = [[False] * len(self.state.hands[0].info)] * len(self.state.hands)
+            rage = range(len(self.state.hands[0].info))
+            rage.reverse()
+            self.age = [list(rage)] * 3
+            self.init = False
                         
         handsize = len(self.state.hands[self.number].info)
+
         if self.state.action.type in ["number", "color"]:
-            target = self.state.action.player
-            if target == self.number:
-                mincard = None
-                for card in self.state.action.cards:
-                    if (mincard == None or self.hage[card] < self.hage[mincard]) and self.hplayable[card] == False:
-                        mincard = card
-                self.hplayable[mincard] = True
-            else:
-                self.xplayable.append(self.state.hands[target].cards[self.youngest(target, self.state.action.cards)])
+            tplayer = self.state.action.player
+            tcard = self.youngest(tplayer, self.state.action.cards)
+            tage = self.age[tplayer].pop(tcard)
+            del(self.playable[tplayer][tcard])
+            self.playable[tplayer].insert(0, True)
+            self.age[tplayer].insert(0, tage)
+
         if self.state.action.type in ["play", "discard"]:
-            if self.state.curplayer == self.number:
-                del(self.hplayable[self.state.action.cards])
-                del(self.hage[self.state.action.cards])
-                for i in range(len(self.hage)):
-                    self.hage[i] += 1
-                self.hplayable.append(False)
-                self.hage.append(0)
-                self.drew = True
+            pcard = self.state.action.cards
+            del(self.playable[curplayer][pcard])
+            del(self.age[curplayer][pcard])
+            self.age[curplayer] = [a + 1 for a in self.age[curplayer]]
+            if False in self.playable[curplayer]:
+                pos = self.playable[curplayer].index(False)
             else:
-                for card in self.state.hands[curplayer].cards:
-                    if card in self.xage:
-                        self.xage[card] += 1
-                    else:
-                        self.xage[card] = 0
-                if self.oldstate != None:
-                    curcard = self.oldstate.hands[self.state.curplayer].cards[self.state.action.cards]
-                    if curcard in self.xplayable:
-                        del(self.xplayable[self.xplayable.index(curcard)])
-        for i in range(handsize):
-            if -1 not in self.state.hands[self.number].info[i]:
-                self.hplayable[i] = True
-        for i in range(len(self.state.hands)):
-            if i != self.number:
-                for j in range(len(self.state.hands[i].cards)):
-                    if -1 not in self.state.hands[i].info[j] and self.state.hands[i].cards[j] not in self.xplayable:
-                        self.xplayable.append(self.state.hands[i].cards[j])
+                pos = 0
+            self.playable[curplayer].insert(pos, False)
+            self.age[curplayer].insert(pos, 0)
+
         if self.drew:
             del(self.hplayable[handsize - 1])
             del(self.hage[handsize - 1])
@@ -123,9 +100,13 @@ class Player:
 
     def legal(self, card):
         match = False
-        for qcard in self.xplayable:
-            if card.number == qcard.number and card.color == qcard.color:
-                match = True
+        for i in range(len(self.playable)):
+            if i != self.number:
+                for j in range(len(self.playable[i])):
+                    if self.playable[i][j]:
+                        qcard = self.state.hands[i].cards[j]
+                        if card.number == qcard.number and card.color == qcard.color:
+                            match = True
         if self.state.stacks[card.color] == card.number and match == False:
             return True
         else:
@@ -146,11 +127,6 @@ class Player:
     def youngest(self, target, cards):
         mincard = None
         for card in cards:
-            if self.state.hands[target].cards[card] not in self.xage:
-                print("card")
-                self.xage[self.state.hands[target].cards[card]] = 0
-            if mincard != None and self.state.hands[target].cards[mincard] not in self.xage:
-                print("mincard")
-            if (mincard == None or self.xage[self.state.hands[target].cards[card]] < self.xage[self.state.hands[target].cards[mincard]]) and card not in self.xplayable:
+            if (mincard == None or self.age[target][card] < self.age[target][mincard]) and not self.playable[target][card]:
                 mincard = card
         return mincard
