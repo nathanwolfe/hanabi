@@ -96,23 +96,32 @@ class Player:
         last_hint = state.action_list[-1]
         # Checks for number hint what was meant: Crit Disc or Ambi Hint
         if not received_full:
-            if last_hint.type == "number" and last_hint.player == self.number:
+            if last_hint.type == "number":
                 # first check to see if all the cards are playable!
                 num_stacks_playable = 0
                 for i in xrange(len(state.stacks)):
-                    if state.stacks[i] == state.hands[self.number].info[last_hint.cards[0]][1]:  # if the ith stack's value is equal to the number that was hinted
+                    if state.stacks[i] == state.hands[last_hint.player].info[last_hint.cards[0]][1]:  # if the ith stack's value is equal to the number that was hinted
                         num_stacks_playable += 1
                 if num_stacks_playable >= len(last_hint.cards):
                     for i in xrange(len(last_hint.cards)):
-                        if state.hands[self.number].cards[last_hint.cards[i]].ID not in self.play_queue:
-                            self.play_queue.append(state.hands[self.number].cards[last_hint.cards[i]].ID)
+                        if state.hands[last_hint.player].cards[last_hint.cards[i]].ID not in self.play_queue:
+                            if self.number == last_hint.player:
+                                self.play_queue.append(state.hands[self.number].cards[last_hint.cards[i]].ID)
+                            self.all_queues[last_hint.player].append(state.hands[last_hint.player].cards[last_hint.cards[i]].ID)
                 else:
                     print "Overflow detected. Wiping up spill."
-            if last_hint.type == "color" and last_hint.player == self.number:
+            if last_hint.type == "color":
                 color_list = []
                 for i in range(len(last_hint.cards)):
-                    color_list.append(state.hands[self.number].cards[last_hint.cards[i]])
-                self.play_queue.append(self.newest_card(color_list).ID)
+                    color_list.append(state.hands[last_hint.player].cards[last_hint.cards[i]])
+                if last_hint.player == self.number:
+                    self.play_queue.append(self.newest_card(color_list).ID)
+                self.all_queues[last_hint.player].append(self.newest_card(color_list).ID)
+
+        print self.all_queues
+
+        if last_hint.type == "play":
+            self.all_queues[state.curplayer].pop(0)
 
     def rearrange(self, state):  # state: same as in move()
         # Rearrange your hand if you want to
