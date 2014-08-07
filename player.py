@@ -35,10 +35,17 @@ class Player:
             for i in range(state.hands[self.number].size):
                 if state.hands[self.number].info[i][0] == -1 and state.hands[self.number].info[i][1] == -1:
                     return Action("discard", i, None)
-            # So everything has info, so let's discard something with only one piece of info.
+            # So everything has info, so let's discard something with only one piece of info, unless it is a 5
+            #Discard useless cards:
+            for i in range(state.hands[self.number].size):
+                if(useless(self, state.hands[self.number].info[i][0], state.hands[self.number].info[i][1]))
+            for i in range(state.hands[self.numer].size):
+                if useless(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1]):
+                    return Action("discard", i, None)
+            
             for i in range(state.hands[self.number].size):
                 if state.hands[self.number].info[i][0] == -1 or state.hands[self.number].info[i][1] == -1:
-                    if state.hands[self.number].info[i][1] != 4 or state.hands[self.number]:
+                    if state.hands[self.number].info[i][1] != 4:
                         return Action("discard", i, None)
             # Whatever, let's just discard something.
             return Action("discard", 0, None)
@@ -76,7 +83,8 @@ class Player:
                 return Action("discard", i, None)
         for i in range(state.hands[self.number].size):
             if state.hands[self.number].info[i][0] == -1 or state.hands[self.number].info[i][1] == -1:
-                return Action("discard", i, None)
+                if state.hands[self.number].info[i][1] != 4:
+                    return Action("discard", i, None)
         return Action("discard", 0, None)
 
     def rearrange(self, state):  # state: same as in move()
@@ -129,7 +137,20 @@ class Player:
                     return True
         return False
         
-            
+    def useless(self, color, number):
+        if color != -1 and number != -1:
+            if stacks[color]-1 >= number:
+                return true
+            else:
+                return false
+        elif number != -1:
+            for i in range(5):
+                if stacks[color] <= number:
+                    return false
+            return true
+        return false
+        
+        
         
         
     
