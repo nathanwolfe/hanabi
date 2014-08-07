@@ -8,8 +8,9 @@ import copy
 import deck_generator  # this is one of our own files
 import sys
 
-HAND_SIZE = 5
-NUM_PLAYERS = 3
+HAND_SIZE = 4
+NUM_PLAYERS = 5
+scores = [0 for i in range(26)]
 
 
 def game_end(game):
@@ -21,6 +22,7 @@ def game_end(game):
     stacks_as_string = ", ".join(str(i) for i in final_state.stacks)
     #    f.write(stacks_as_string + "\n")
     print final_state.calc_score()
+    scores[final_state.calc_score()] += 1
     print "Hints:"
     f.write("Score: " + str(final_state.calc_score()) + "\n")
 
@@ -136,5 +138,15 @@ def main():
             game_end(game)
             break
 
-for i in range(100):
+ITER = 1000
+for i in range(ITER):
     main()
+    if i == ITER - 1:
+        f = open("scores.txt", "w")
+        f.write(str(scores) + "\n\n")
+        total = 0
+        for j in xrange(len(scores)):
+            if scores[j] != 0:
+                f.write(str(j) + ": " + str(scores[j]) + "\n")
+                total += j * scores[j]
+        f.write("Average: " + str(total / float(ITER)))
