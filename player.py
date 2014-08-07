@@ -12,6 +12,7 @@ class Player:
         self.playable = None
         self.age = None
         self.binit = True
+        self.psave = 0
 
     def __deepcopy__(self, memo):
         return None
@@ -27,6 +28,13 @@ class Player:
                 self.playable.append([False for j in range(handsize)])
                 self.age.append([handsize - j - 1 for j in range(handsize)])
             self.binit = False
+
+        if self.psave == 1:
+            self.psave = 0
+            return Action("discard", len(self.state.hands[self.number].info) - 1, None)
+        elif self.psave == 2:
+            self.psave = 0
+            return Action("number", 0, (self.number - 2) % len(self.state.hands))
 
         for i in range(len(self.playable[self.number])):
             if self.playable[self.number][i]:
@@ -65,9 +73,15 @@ class Player:
         if self.state.action.type in ["number", "color"]:
             tplayer = self.state.action.player
             tcard = self.youngest(tplayer, self.state.action.cards)
+            if self.oldstate != None and self.oldstate.action != None and self.oldstate.action.type == "discard" and self.oldstate.hints > 0:
+                tcard = len(self.state.hands[tplayer].info) - 1
+            assert str(type(tcard)) == "<type 'int'>", tcard
             tage = self.age[tplayer].pop(tcard)
             del(self.playable[tplayer][tcard])
-            self.playable[tplayer].insert(0, True)
+            if self.oldstate != None and self.oldstate.action != None and self.oldstate.action.type == "discard" and self.oldstate.hints > 0:
+                self.playable[tplayer].insert(0, False)
+            else:
+                self.playable[tplayer].insert(0, True)
             self.age[tplayer].insert(0, tage)
             if tplayer == self.number:
                 print "player", self.number + 1, "received hint pos", tcard
@@ -94,6 +108,14 @@ class Player:
 
     def scan(self, newstate):
         self.state = newstate
+        curplayer = self.state.curplayer
+        
+        if self.state.action.type in ["play", "discard"] and self.psave == 0 and self.state.hints > 0:
+            if self.number != curplayer and self.last(self.state.hands[curplayer].cards[-1]):
+                if self.number == (curplayer + 1) % len(self.state.hands):
+                    self.psave = 1
+                elif self.number == (curplayer + 2) % len(self.state.hands):
+                    self.psave = 2
 
     def legal(self, card):
         match = False
@@ -128,3 +150,25 @@ class Player:
             if (mincard == None or self.age[target][card] < self.age[target][mincard]) and not self.playable[target][card]:
                 mincard = card
         return mincard
+
+    def last(self, card):
+        if self.state.stacks[card.color] > card.number:
+            return False
+        elif card.number == 0:
+            matches = 0
+            for dcard in self.state.discards:
+                if card.number == dcard.number and card.color == dcard.color:
+                    matches += 1
+            if matches == 2:
+                return True
+        elif card.number in [1, 2, 3]:
+            matches = 0
+            for dcard in self.state.discards:
+                if card.number == dcard.number and card.color == dcard.color:
+                    matches += 1
+            if matches == 1:
+                return True
+        elif card.number == 4:
+            return True
+        else:
+            return False
