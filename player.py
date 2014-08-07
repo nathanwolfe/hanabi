@@ -2,7 +2,6 @@ from card import Card
 from deck import Deck
 from action import Action
 from operator import attrgetter
-from random import shuffle
 """
 This is an example player file. AI developers should be able to specify their own players later.
 """
@@ -35,7 +34,7 @@ class Player:
                 pass  # do something here...
             else:
                 if state.hints == 1 or not a_hint[2] == "color":
-                    print "Critical discard hint given."
+                    print "Critical discard hint given:" + str(next_discard.ID)
                     return self.warn_critical(state, next_p)
 
         # Case: there are playable cards in queue
@@ -133,10 +132,6 @@ class Player:
                 known.append(i)
             else:
                 other.append(i)
-        shuffle(other)
-        shuffle(known)
-        shuffle(play)
-        shuffle(last)
         return other + known + play + last
 
     def playable(self, color, number, stacks):
