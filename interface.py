@@ -15,19 +15,19 @@ NUM_PLAYERS = 3
 def game_end(game):
     # add more stuff later, this is a end game clean up function.
     final_state = game.states[len(game.states) - 1]
-    f = open("game_results.txt", "a")
+    f = open("game_results.txt", "w")
     print "Game Over: Results"
     print final_state.stacks
     stacks_as_string = ", ".join(str(i) for i in final_state.stacks)
-#    f.write(stacks_as_string + "\n")
+    #    f.write(stacks_as_string + "\n")
     print final_state.calc_score()
     print "Hints:"
     f.write("Score: " + str(final_state.calc_score()) + "\n")
 
-#    f.write("Discarded cards:\n")
-#    for i in final_state.discards:
-#        f.write(i.to_string() + str("\n"))
-#    sys.exit()  # just exits the program.
+    #    f.write("Discarded cards:\n")
+    #    for i in final_state.discards:
+    #        f.write(i.to_string() + str("\n"))
+    #    sys.exit()  # just exits the program.
 
 
 def setup():
@@ -56,9 +56,9 @@ def main():
 
     # print out all the cards of all the players for debug
     for i in game.states[0].hands:
-        print "----------P" + str(game.states[0].curplayer + 1) + "-----------"
-        for j in i.cards:
-            print j.to_string()
+        # print "----------P" + str(game.states[0].curplayer + 1) + "-----------"
+        # for j in i.cards:
+            # print j.to_string()
         game.states[0].curplayer += 1
 
     game.states[0].curplayer = 0  # setting back to 0
@@ -68,7 +68,7 @@ def main():
         # idea: copy current state, make moves, put this modified state as the new state
         # at end of states list of game, let players rearrange hand, let players look around.
         state = game.states[curturn]
-        print "----------P" + str(state.curplayer + 1) + "-----------"
+        # print "----------P" + str(state.curplayer + 1) + "-----------"
         # Censor information of player's own hand + the deck and then pass to the player for a move
         censored = copy.deepcopy(state)
         for i in xrange(len(censored.hands[state.curplayer].cards)):
@@ -77,11 +77,11 @@ def main():
             censored.deck.cards[i] = Card(-1, -1, censored.deck.cards[i].ID)
         curmove = state.players[state.curplayer].move(censored, NUM_PLAYERS)
         if curmove.type == "play":
-            print "Card played: " + state.hands[state.curplayer].cards[curmove.cards].to_string()
+            # print "Card played: " + state.hands[state.curplayer].cards[curmove.cards].to_string()
             if not state.hands[state.curplayer].play(state, curmove.cards):
                 state.lives -= 1
         elif curmove.type == "discard":
-            print "Card destructioned: " + state.hands[state.curplayer].cards[curmove.cards].to_string()
+            # print "Card destructioned: " + state.hands[state.curplayer].cards[curmove.cards].to_string()
             state.hands[state.curplayer].discard(state, curmove.cards)
             if state.hints < 8:
                 state.hints += 1
@@ -99,7 +99,7 @@ def main():
         state.attach_action(curmove)
 
         # recreate g_state and add to list of states
-        print state.stacks
+        # print state.stacks
         for p in state.players:
             # censor hands + the deck then pass for lookaround
             visible = copy.deepcopy(state)
@@ -119,10 +119,6 @@ def main():
         permutation = state.players[state.curplayer].rearrange(visible)
         state.hands[state.curplayer].rearrange(permutation)
 
-        # debug
-        for k in state.hands[state.curplayer].cards:
-            print k.to_string()
-
         state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
         curturn += 1
         state.turns = curturn
@@ -134,7 +130,7 @@ def main():
             if state.lives <= 0:
                 print "btdubs you died"
             game_end(game)
-        break
-            
-for i in range(10):
+            break
+
+for i in range(100):
     main()
