@@ -7,6 +7,7 @@ from hand import Hand
 import copy
 import deck_generator  # this is one of our own files
 
+
 HAND_SIZE = 4
 NUM_PLAYERS = 5
 scores = [0 for i in range(26)]
@@ -29,7 +30,6 @@ def game_end(game):
     for i in final_state.discards:
         f.write(i.to_string() + str("\n"))
     # sys.exit()  # just exits the program.
-
 
 def setup():
     deck = deck_generator.generate()
