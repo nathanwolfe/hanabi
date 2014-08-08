@@ -17,6 +17,7 @@ full_list = list_1 + list_2 + list_3
 def generate():
     # Generate random number, pull the card at that index from full_list, add to final_list.
     final_list = []
+    #random.seed(259458)
     for i in range(50):
         curr_card = random.randint(0, len(full_list) - 1)
         final_list.append(full_list.pop(curr_card))

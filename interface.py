@@ -16,7 +16,9 @@ def game_end(game):
     # add more stuff later, this is a end game clean up function.
     f = open("game_results.txt", "w")
     print "Game Over: Results"
-    print game.states[len(game.states) - 1].stacks
+    print "Stacks: " + str(game.states[len(game.states) - 1].stacks)
+    print "Discards: " + str([card.to_string() for card in game.states[len(game.states) - 1].discards])
+    print "Lives remaining: " + str(game.states[len(game.states) - 1].lives)
     stacks_as_string = ", ".join(str(i) for i in game.states[len(game.states) - 1].stacks)
     f.write(stacks_as_string + "\n")
     print game.states[len(game.states) - 1].calc_score()
@@ -57,12 +59,14 @@ def main():
 
     game.states[0].curplayer = 0  # setting back to 0
     curturn = 0  # the current turn (first turn is turn 0)
-    final_countdown = NUM_PLAYERS  # this is for when all the cards run out
+    final_countdown = NUM_PLAYERS + 1  # this is for when all the cards run out
     while True:
         # idea: copy current state, make moves, put this modified state as the new state
         # at end of states list of game, let players rearrange hand, let players look around.
         state = game.states[curturn]
-        print "----------P" + str(state.curplayer + 1) + "-----------"
+        print "----------Turn " + str(curturn) + ", P" + str(state.curplayer + 1) + "-----------"
+        print "Hints available: " + str(state.hints)
+        
         # Censor information of player's own hand + the deck and then pass to the player for a move
         censored = copy.deepcopy(state)
         censored.hands[state.curplayer].cards = []
@@ -95,6 +99,7 @@ def main():
             print k.to_string()
         state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
         curturn += 1
+        print "Stacks: " + str(state.stacks)
 
         # recreate g_state and add to list of states - WILL NEED TO BE CHANGED WHEN HINT IS ADDED
         # Why does this need to be changed? --Jerry
