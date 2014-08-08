@@ -24,30 +24,9 @@ class Player:
         give hints to players
         if nothing else can be done, discard
         """
-        next_p = (self.number + 1) % nplayers  # generally helpful index
-        next_discard = state.hands[next_p].cards[0]
-        a_hint = self.select_hint(state, next_p)
-        a_card = state.hands[next_p].cards[self.index_from_ID(state, a_hint[1], a_hint[0])]  # the card that may be hinted instead of crit discard
-        # Case: critical discard of next person
-        if self.is_critical(state, next_discard.color, next_discard.number) and state.hints > 0:
-            if self.playable(a_card.color, a_card.number, state.stacks):
-                pass  # do something here...
-            else:
-                if state.hints == 1 or not a_hint[2] == "color":
-                    print "Critical discard hint given:" + str(next_discard.ID)
-                    return self.warn_critical(state, next_p)
-
-        # Case: there are playable cards in queue
-        if len(self.play_queue) > 0:
-            print "Play_queue: " + str(self.play_queue)
-            print "Played the card at index: " + str(self.index_from_ID(state, self.play_queue[0], self.number))
-            return Action("play", self.index_from_ID(state, self.play_queue.pop(0), self.number), None)
-
-        # Prioritize hints to players
-        # assuming select_hint returns a triple [player, ID, hint type]
-        cur_p = (self.number + 1) % nplayers
-        poss_hints = []  # possible hint for each player
         hint_triples = []
+        next_p = (self.number + 1) % nplayers  # generally helpful index
+        discard_flag = 1
         for p in range(nplayers):
             if p == self.number:
                 continue
@@ -57,14 +36,39 @@ class Player:
             if h != [-1, -1, -1]:
                 hint_triple = h
                 break
-        print hint_triple
+        if (len(self.play_queue) == 0 and hint_triple[0] == next_p) or (len(self.play_queue) > 0 and hint_triple != [-1, -1, -1]):
+            discard_flag = 0
+        
+        next_discard = state.hands[next_p].cards[0]
+        a_hint = self.select_hint(state, next_p)
+        a_card = state.hands[next_p].cards[self.index_from_ID(state, a_hint[1], a_hint[0])]  # the card that may be hinted instead of crit discard
+        # Case: critical discard of next person
+        if self.is_critical(state, next_discard.color, next_discard.number) and state.hints > 0 and discard_flag == 1:
+            if not self.playable(a_card.color, a_card.number, state.stacks):
+                if state.hints == 1 or not a_hint[2] == "color":
+                    # print "Critical discard hint given:" + str(next_discard.ID)
+                    return self.warn_critical(state, next_p)
+
+        # Case: there are playable cards in queue
+        if len(self.play_queue) > 0:
+            # print "Play_queue: " + str(self.play_queue)
+            # print "Played the card at index: " + str(self.index_from_ID(state, self.play_queue[0], self.number))
+            return Action("play", self.index_from_ID(state, self.play_queue.pop(0), self.number), None)
+
+        # Prioritize hints to players
+        # assuming select_hint returns a triple [player, ID, hint type]
+        cur_p = (self.number + 1) % nplayers
+        poss_hints = []  # possible hint for each player
+        # print hint_triple
         hint_card = state.hands[cur_p].cards[self.index_from_ID(state, hint_triple[1], cur_p)]
         if hint_triple[1] != -1 and (self.playable(hint_card.color, hint_card.number, state.stacks) or hint_triple[2] == "color"):
+            """
             print "Hinted to " + str(hint_triple[0]) + " the card at " + str(state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0])) + "."
             if hint_triple[2] == "color":
                 print "Color hinted."
             elif hint_triple[2] == "number":
                 print "Number hinted."
+            """
             return Action(hint_triple[2], state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0]), hint_triple[0])
         elif hint_triple[1] != -1:
             poss_hints.append(hint_triple)
@@ -111,8 +115,6 @@ class Player:
                     self.play_queue.append(self.newest_card(color_list).ID)
                 self.all_queues[last_hint.player].append(self.newest_card(color_list).ID)
 
-        # print self.all_queues
-
         if last_hint.type == "play":
             self.all_queues[state.curplayer].pop(0)
 
@@ -124,7 +126,7 @@ class Player:
         known = []
         other = []
         for i in xrange(state.hands[self.number].size):
-            if self.is_last(state, state.hands[self.number].info[i][0], state.hands[self.number].info[i][1]):
+            if self.might_be_last(state, state.hands[self.number].info[i][1]):
                 last.append(i)
             elif self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
                 play.append(i)
@@ -157,10 +159,10 @@ class Player:
         # NOTE: If the card is a red 1, and a red 1 has been successfully played in the past, this will still return FALSE even if this is the last red 1
         counter = 0
 
-        if card_color == -1 or card_num == -1:
-            return False
         if card_num == 4:
             return True
+        if card_color == -1 or card_num == -1:
+            return False
         # if card is smaller than the highest card played of its color (see function comments)
         if card_num < state.stacks[card_color]:
             return False
@@ -245,6 +247,23 @@ class Player:
                     elif state.hands[p].info[i][1] != -1:
                         return [p, state.hands[p].cards[i].ID, "color"]
         return [-1, -1, -1]
+
+    def might_be_last(self, state, number):
+        # assumes color is not known
+        discard_sizes = [0 for i in range(5)]
+
+        for c in state.discards:
+            if state.stacks[c.color] >= c.number and c.number == number:
+                discard_sizes[c.color] += 1
+
+        if number == 0 and max(discard_sizes) >= 2:
+            return True
+        elif number == 4:
+            return True
+        elif max(discard_sizes) >= 1:
+            return True
+
+        return False
 
     def select_hint_old(self, state):
         # primitive version prioritizes players nearest to current player in playing order above all else.
@@ -357,8 +376,17 @@ class Player:
             if stack_number_size < len(numlists[i]):
                 hintable_numbers_noneplayable.append([i, len(numlists[i])])
 
-        if hintable_numbers_allplayable != []:
-            to_play = max(hintable_numbers_allplayable, key=lambda x: x[1])
+        unplayable = [0 for i in xrange(len(hintable_numbers_allplayable))]
+        for i in xrange(len(hintable_numbers_allplayable)):
+            for j in xrange(len(hintable_numbers_allplayable[i])):
+                if state.hands[player].cards[0].ID == j:
+                    unplayable[i] = 1
+                    break
+
+        hintable_numbers_really_allplayable = [hintable_numbers_allplayable[i] for i in xrange(len(hintable_numbers_allplayable)) if unplayable[i] == 0]
+
+        if hintable_numbers_really_allplayable != []:
+            to_play = max(hintable_numbers_really_allplayable, key=lambda x: x[1])
         elif hintable_numbers_noneplayable != []:
             to_play = max(hintable_numbers_noneplayable, key=lambda x: x[1])
         else:
