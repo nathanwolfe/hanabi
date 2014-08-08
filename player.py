@@ -30,11 +30,26 @@ class Player:
             self.binit = False
 
         if self.psave == 1:
-            self.psave = 0
+            self.psave = 0.5
+            print "discard for save"
             return Action("discard", len(self.state.hands[self.number].info) - 1, None)
         elif self.psave == 2:
             self.psave = 0
-            return Action("number", 0, (self.number - 2) % len(self.state.hands))
+            if self.last(self.state.hands[(self.number - 1) % len(self.state.hands)].cards[-1]):
+                tplayer = (self.number - 1) % len(self.state.hands)
+                print "saving players", ((self.number - 2) % len(self.state.hands)) + 1, tplayer + 1
+            else:
+                tplayer = ((self.number - 2) % len(self.state.hands))
+                print "saving player", tplayer + 1
+            
+            # for card in self.state.hands[tplayer].cards:
+            #     for type in ["number", "color"]:
+            #         cindex = self.youngest(tplayer, self.hintcards(type, tplayer, card))
+            #         if cindex != None and not self.legal(self.state.hands[tplayer].cards[cindex]):
+            #             return Action("number", cindex, tplayer)
+            # assert False
+
+            return Action("number", 0, tplayer)
 
         for i in range(len(self.playable[self.number])):
             if self.playable[self.number][i]:
@@ -48,9 +63,12 @@ class Player:
                 for card in self.state.hands[player].cards:
                     if self.legal(card):
                         for type in ["number", "color"]:
-                            if self.state.hands[player].cards[self.youngest(player, self.hintcards(type, player, card))] == card:
-                                print "hinting", card.number, card.color, "pos", self.state.hands[player].cards.index(card), "player", player + 1
-                                return Action(type, self.state.hands[player].cards.index(card), player)
+                            if self.state.hands[player].cards.index(card) == self.youngest(player, self.hintcards(type, player, card)):
+                                if self.legal(card):
+                                    print "hinting", card.number, card.color, "pos", self.state.hands[player].cards.index(card), "player", player + 1
+                                    return Action(type, self.state.hands[player].cards.index(card), player)
+        else:
+            print "forced to discard"
         
         return Action("discard", len(self.state.hands[self.number].info) - 1, None)
 
@@ -71,14 +89,18 @@ class Player:
             self.binit = False
 
         if self.state.action.type in ["number", "color"]:
+            afoot = False
             tplayer = self.state.action.player
             tcard = self.youngest(tplayer, self.state.action.cards)
-            if self.oldstate != None and self.oldstate.action != None and self.oldstate.action.type == "discard" and self.oldstate.hints > 0:
+
+            if self.oldstate != None and self.oldstate.action != None and self.oldstate.action.type == "discard" and self.state.hints > 0 and ((tplayer == self.number and (self.psave == 0.5 or self.number == (curplayer - 2) % len(self.state.hands))) or (tplayer != self.number and self.last(self.state.hands[tplayer].cards[-1]))):
+                print self.number + 1, "afoot"
+                afoot = True
+                tplayer = (curplayer - 2) % len(self.state.hands)
                 tcard = len(self.state.hands[tplayer].info) - 1
-            assert str(type(tcard)) == "<type 'int'>", tcard
             tage = self.age[tplayer].pop(tcard)
             del(self.playable[tplayer][tcard])
-            if self.oldstate != None and self.oldstate.action != None and self.oldstate.action.type == "discard" and self.oldstate.hints > 0:
+            if afoot:
                 self.playable[tplayer].insert(0, False)
             else:
                 self.playable[tplayer].insert(0, True)
@@ -87,6 +109,12 @@ class Player:
                 print "player", self.number + 1, "received hint pos", tcard
                 tpos = permute.pop(tcard)
                 permute.insert(0, tpos)
+            if tplayer != self.state.action.player:
+                if self.state.action.player == self.number and self.psave == 0.5:
+                    print "player", self.number + 1, "received secondary save"
+                    tpos = permute.pop(-1)
+                    permute.insert(0, tpos)
+            self.psave = 0
 
         if self.state.action.type in ["play", "discard"]:
             pcard = self.state.action.cards
@@ -110,12 +138,21 @@ class Player:
         self.state = newstate
         curplayer = self.state.curplayer
         
+        if self.psave != 0:
+            print self.number + 1, "psave not 0"
+
         if self.state.action.type in ["play", "discard"] and self.psave == 0 and self.state.hints > 0:
             if self.number != curplayer and self.last(self.state.hands[curplayer].cards[-1]):
+                print self.number + 1, "sees last"
                 if self.number == (curplayer + 1) % len(self.state.hands):
                     self.psave = 1
+                    print "psave 1, player", self.number + 1
                 elif self.number == (curplayer + 2) % len(self.state.hands):
                     self.psave = 2
+                    print "psave 2, player", self.number + 1
+                    print "want to save", self.state.hands[curplayer].cards[-1].number, self.state.hands[curplayer].cards[-1].color
+                else:
+                    self.psave = -1
 
     def legal(self, card):
         match = False
@@ -126,6 +163,7 @@ class Player:
                         qcard = self.state.hands[i].cards[j]
                         if card.number == qcard.number and card.color == qcard.color:
                             match = True
+
         if self.state.stacks[card.color] == card.number and match == False:
             return True
         else:
@@ -141,7 +179,6 @@ class Player:
             for i in range(len(self.state.hands[target].cards)):
                 if self.state.hands[target].cards[i].color == card.color:
                     result.append(i)
-        # print result
         return result
 
     def youngest(self, target, cards):
@@ -149,6 +186,8 @@ class Player:
         for card in cards:
             if (mincard == None or self.age[target][card] < self.age[target][mincard]) and not self.playable[target][card]:
                 mincard = card
+        # if mincard == None:
+        #     mincard = 0
         return mincard
 
     def last(self, card):

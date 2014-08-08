@@ -22,8 +22,9 @@ def game_end(game):
     print game.states[len(game.states) - 1].calc_score()
     print game.states[len(game.states) - 1].lives
     f.write("Score: " + str(game.states[len(game.states) - 1].calc_score()))
-
-    sys.exit()  # just exits the program.
+    
+    # sys.exit()  # just exits the program.
+    return game.states[len(game.states) - 1].calc_score()
 
 
 def setup():
@@ -97,13 +98,16 @@ def main():
         # recreate g_state and add to list of states - WILL NEED TO BE CHANGED WHEN HINT IS ADDED
         # Why does this need to be changed? --Jerry
         game.states.append(state)
+        visible = [None] * NUM_PLAYERS
+        for i in range(NUM_PLAYERS):
+            visible[i] = copy.deepcopy(state)
+
         for p in state.players:
             # censor each player's hands + the deck, then pass state for rearrangement
-            visible = copy.deepcopy(state)
-            visible.hands[p.number].cards = []
-            for i in xrange(len(visible.deck.cards)):
-                visible.deck.cards[i] = Card(0, 0)
-            permutation = p.rearrange(visible)
+            visible[p.number].hands[p.number].cards = []
+            for i in xrange(len(visible[p.number].deck.cards)):
+                visible[p.number].deck.cards[i] = Card(0, 0)
+            permutation = p.rearrange(visible[p.number])
             state.hands[p.number].rearrange(permutation)
 
         for p in state.players:
@@ -113,6 +117,8 @@ def main():
             for i in xrange(len(visible.deck.cards)):
                 visible.deck.cards[i] = Card(0, 0)
             p.scan(visible)
+
+        assert state.players[0].playable == state.players[1].playable == state.players[2].playable
         
         state.curplayer = (state.curplayer + 1) % NUM_PLAYERS
         curturn += 1
@@ -122,5 +128,5 @@ def main():
         if state.lives <= 0 or state.calc_score() == 25 or final_countdown == 0:
             if state.lives <= 0:
                 print "Game lost."
-            game_end(game)
+            return game_end(game)
 main()
