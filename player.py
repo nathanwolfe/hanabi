@@ -46,13 +46,13 @@ class Player:
         if self.is_critical(state, next_discard.color, next_discard.number) and state.hints > 0 and discard_flag == 1:
             if not self.playable(a_card.color, a_card.number, state.stacks):
                 if state.hints == 1 or not a_hint[2] == "color":
-                    # print "Critical discard hint given:" + str(next_discard.ID)
+                    print "Critical discard hint given:" + str(next_discard.ID)
                     return self.warn_critical(state, next_p)
 
         # Case: there are playable cards in queue
         if len(self.play_queue) > 0:
             # print "Play_queue: " + str(self.play_queue)
-            # print "Played the card at index: " + str(self.index_from_ID(state, self.play_queue[0], self.number))
+            print "Played the card at index: " + str(self.index_from_ID(state, self.play_queue[0], self.number))
             return Action("play", self.index_from_ID(state, self.play_queue.pop(0), self.number), None)
 
         # Prioritize hints to players
@@ -62,20 +62,18 @@ class Player:
         # print hint_triple
         hint_card = state.hands[cur_p].cards[self.index_from_ID(state, hint_triple[1], cur_p)]
         if hint_triple[1] != -1 and (self.playable(hint_card.color, hint_card.number, state.stacks) or hint_triple[2] == "color"):
-            """
             print "Hinted to " + str(hint_triple[0]) + " the card at " + str(state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0])) + "."
             if hint_triple[2] == "color":
                 print "Color hinted."
             elif hint_triple[2] == "number":
                 print "Number hinted."
-            """
             return Action(hint_triple[2], state.players[hint_triple[0]].index_from_ID(state, hint_triple[1], hint_triple[0]), hint_triple[0])
         elif hint_triple[1] != -1:
             poss_hints.append(hint_triple)
         cur_p = (cur_p + 1) % nplayers
 
         # Case: if nothing else can be done, discard
-        # print "Discarding."
+        print "Discarding."
         return Action("discard", 0, None)
 
     def analyze(self, state, nplayers):
@@ -387,8 +385,8 @@ class Player:
 
         if hintable_numbers_really_allplayable != []:
             to_play = max(hintable_numbers_really_allplayable, key=lambda x: x[1])
-        elif hintable_numbers_noneplayable != []:
-            to_play = max(hintable_numbers_noneplayable, key=lambda x: x[1])
+        # elif hintable_numbers_noneplayable != []:
+            # to_play = max(hintable_numbers_noneplayable, key=lambda x: x[1])
         else:
             return -1
 
