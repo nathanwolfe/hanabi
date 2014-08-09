@@ -38,7 +38,7 @@ class Player:
                 break
         if (len(self.play_queue) == 0 and hint_triple[0] == next_p) or (len(self.play_queue) > 0 and hint_triple != [-1, -1, -1]):
             discard_flag = 0
-        
+
         next_discard = state.hands[next_p].cards[0]
         a_hint = self.select_hint(state, next_p)
         a_card = state.hands[next_p].cards[self.index_from_ID(state, a_hint[1], a_hint[0])]  # the card that may be hinted instead of crit discard
@@ -126,10 +126,9 @@ class Player:
         discard = []
         for i in xrange(state.hands[self.number].size):
             poss_play = False
-            for i in range(len(state.stacks)):
-                if state.hands[self.number].info[i][1] != -1 and state.stacks[i] <= state.hands[self.number].info[i][1]:
+            for j in range(len(state.stacks)):
+                if state.hands[self.number].info[i][1] != -1 and state.stacks[j] <= state.hands[self.number].info[i][1]:
                     poss_play = True
-
             if self.might_be_last(state, state.hands[self.number].info[i][1]):
                 last.append(i)
             elif self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
@@ -145,6 +144,7 @@ class Player:
                 known.append(i)
             else:
                 other.append(i)
+        print discard + other + known + play + last
         return discard + other + known + play + last
 
     def playable(self, color, number, stacks):
