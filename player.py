@@ -123,16 +123,29 @@ class Player:
         play = []
         known = []
         other = []
+        discard = []
         for i in xrange(state.hands[self.number].size):
+            poss_play = False
+            for i in range(len(state.stacks)):
+                if state.hands[self.number].info[i][1] != -1 and state.stacks[i] <= state.hands[self.number].info[i][1]:
+                    poss_play = True
+
             if self.might_be_last(state, state.hands[self.number].info[i][1]):
                 last.append(i)
             elif self.playable(state.hands[self.number].info[i][0], state.hands[self.number].info[i][1], state.stacks):
                 play.append(i)
+            elif (state.hands[self.number].info[i][0] != -1 and state.hands[self.number].info[i][0] != -1) and state.hands[self.number].info[i][1] < state.stacks[state.hands[self.number].info[i][0]]:
+                # this is known but should be discarded
+                discard.append(i)
+            elif state.hands[self.number].info[i][0] != -1 and state.stacks[state.hands[self.number].info[i][0]] == 4:
+                discard.append(i)
+            elif not poss_play:
+                discard.append(i)
             elif (not state.hands[self.number].info[i][0] == -1) or (not state.hands[self.number].info[i][1]):
                 known.append(i)
             else:
                 other.append(i)
-        return other + known + play + last
+        return discard + other + known + play + last
 
     def playable(self, color, number, stacks):
         # Is the card guaranteed playable on stacks (list)?
