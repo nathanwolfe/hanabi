@@ -57,7 +57,7 @@ def main():
 
     game.states[0].curplayer = 0  # setting back to 0
     curturn = 0  # the current turn (first turn is turn 0)
-    final_countdown = NUM_PLAYERS  # this is for when all the cards run out
+    final_countdown = NUM_PLAYERS + 1 # this is for when all the cards run out
     while True:
         # idea: copy current state, make moves, put this modified state as the new state
         # at end of states list of game, let players rearrange hand, let players look around.
